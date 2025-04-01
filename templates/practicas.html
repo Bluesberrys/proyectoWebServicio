@@ -20,14 +20,21 @@
           <h1 class="alt-font">IntelliTutor UNAM</h1>
         </a>
       </div>
-      <div class="header-btns">
-        <a href="{{ url_for('index') }}" class="btn alt-font">Inicio</a>
-        <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
-        <a href="{{ url_for('evaluacion') }}" class="btn alt-font">Evaluación</a>
+
+      <div class="menu">
+        <div class="header-btns">
+          <a href="{{ url_for('index') }}" class="btn alt-font">Inicio</a>
+          <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
+          <a href="{{ url_for('evaluacion') }}" class="btn alt-font">Evaluación</a>
+        </div>
+        <div class="user-menu">
+          <a href="/regis" id="regis" class="btn alt-font">Registrarse</a>
+          <a href="/login" id="login" class="btn alt-font">Iniciar sesión</a>
+        </div>
       </div>
-      <div class="user-menu">
-        <a href="" id="regis" class="btn alt-font">Registrarse</a>
-        <a href="" id="login" class="btn alt-font">Iniciar sesión</a>
+
+      <div class="burger-menu">
+        <i class="fas fa-bars"></i>
       </div>
     </header>
 
@@ -101,7 +108,7 @@
             </select>
           </div>
 
-          <button type="submit" id="form-btn" class="alt-font">Agregar</button>
+          <button type="submit" class="form-btn alt-font">Agregar</button>
         </form>
       </div>
 

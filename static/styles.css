@@ -192,6 +192,20 @@ main#homepage {
   padding: 0;
 }
 
+main#log-in {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+main#register {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
 .practica-content {
   display: flex;
   flex-direction: column;
@@ -228,6 +242,15 @@ main#ver-practica span {
   background-color: var(--white);
   border-radius: 20px;
 }
+
+#log-in #form-container {
+  width: 30%;
+}
+
+#register #form-container {
+  width: 30%;
+}
+
 #usuarios #form-container {
   width: 100%;
   height: fit-content;
@@ -249,7 +272,15 @@ main#ver-practica span {
   padding: 25px;
 }
 
-#form-btn {
+#login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  padding: 25px;
+}
+
+.form-btn {
   grid-column: 1 / -1;
   font-size: 1.2em;
   padding: 20px 0;
@@ -277,6 +308,44 @@ main#ver-practica span {
   padding: 10px;
   border-radius: 12px;
   border: 2px solid var(--azul-unam-d1);
+}
+
+.passwd-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwd-container .form-input {
+  width: 100%;
+  padding-right: 40px; /* Space for the toggle button */
+}
+
+/* Password Toggle Button */
+.toggle-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #333;
+}
+
+/* Forgot Password Link */
+.password-options {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 5px;
+}
+
+.forgot-password {
+  font-size: 14px;
+  color: var(--azul-unam-l2);
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .titulo {

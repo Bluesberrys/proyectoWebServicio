@@ -11,6 +11,7 @@ DB_CONFIG = {
 # Configuración de la aplicación
 APP_CONFIG = {
     "SECRET_KEY": os.environ.get("SECRET_KEY", "clave_secreta_desarrollo"),
+    "JWT_SECRET_KEY": os.environ.get("JWT_SECRET_KEY", "clave_secreta_desarollo"),
     "DEBUG": os.environ.get("DEBUG", "True") == "True",
     "UPLOAD_FOLDER": os.environ.get("UPLOAD_FOLDER", "uploads"),
     "ALLOWED_EXTENSIONS": {'pdf', 'doc', 'docx', 'txt'},

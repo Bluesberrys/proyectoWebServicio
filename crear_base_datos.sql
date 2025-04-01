@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
+    passwd VARCHAR(255) NOT NULL,
     rol ENUM('estudiante', 'profesor', 'admin') NOT NULL,
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -205,9 +205,8 @@ CREATE TABLE IF NOT EXISTS evaluaciones (
 );
 
 
-
 -- Insertar usuarios de ejemplo
-INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES
+INSERT INTO usuarios (nombre, email, passwd, rol) VALUES
 ('Juan Pérez', 'juan@universidad.edu', 'hash123', 'profesor'),
 ('María García', 'maria@universidad.edu', 'hash456', 'estudiante'),
 ('Admin Sistema', 'admin@universidad.edu', 'hash789', 'admin'),

@@ -1,6 +1,7 @@
 Flask==3.1.0
 Flask-wtf==1.2.2
 Flask-SQLAlchemy==3.1.1
+Flask-JWT-Extended
 scikit-learn==1.6.1
 pandas==2.2.3
 numpy==2.2.4

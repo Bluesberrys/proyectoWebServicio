@@ -99,6 +99,7 @@ class Usuario:
     nombre: str
     email: str
     rol: str
+    passwd: Optional[str] = None
 
 @dataclass
 class Concepto:
@@ -824,3 +825,41 @@ class GeneradorPracticasExtendido:
 
     def __del__(self):
         self.cerrar_conexion()
+    
+    def autenticar_usuario(self, email, password): 
+        """Authenticate a user in the database"""
+        try:
+            query = """
+                SELECT id FROM usuarios
+                WHERE email = %s AND passwd = %s
+            """
+            self.cursor.execute(query, (email, hashlib.sha256(password.encode()).hexdigest()))
+            result = self.cursor.fetchone()
+            if result:
+                return result['id']  # Return user ID
+            else:
+                return None
+        except Error as e:
+            self.logger.error(f"Error al autenticar usuario: {str(e)}")
+            return None
+        
+
+    def agregar_usuario(self, usuario: Usuario):
+        """Agrega un nuevo usuario a la base de datos"""
+        try:
+            query = """
+                INSERT INTO usuarios (nombre, email, passwd, rol)
+                VALUES (%s, %s, %s, %s)
+            """
+            self.cursor.execute(query, (
+                usuario.nombre,
+                usuario.email,
+                hashlib.sha256(usuario.passwd.encode()).hexdigest(),
+                usuario.rol
+            ))
+            self.connection.commit()
+            return self.cursor.lastrowid
+        except Error as e:
+            self.connection.rollback()
+            self.logger.error(f"Error al agregar usuario: {str(e)}")
+            return None
