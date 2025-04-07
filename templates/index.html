@@ -3,20 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IntelliTutor UNAM</title>
+    <title>Iniciar Sesión</title>
     <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Josefin+Slab:wght@100..700&display=swap"
       rel="stylesheet" />
-    <script src="https://kit.fontawesome.com/71a7ab61a9.js" crossorigin="anonymous"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
-
   <body>
     <header>
       <div class="logo">
@@ -25,70 +20,24 @@
           <h1 class="alt-font">IntelliTutor UNAM</h1>
         </a>
       </div>
-
-      <div class="menu">
-        <div class="header-btns">
-          <a href="{{ url_for('index') }}" class="btn alt-font">Inicio</a>
-          <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
-          <a href="{{ url_for('evaluacion') }}" class="btn alt-font">Evaluación</a>
-        </div>
-        <div class="user-menu">
-          <a href="" id="regis" class="btn alt-font">Registrarse</a>
-          <a href="" id="login" class="btn alt-font">Iniciar sesión</a>
-        </div>
-      </div>
-
-      <div class="burger-menu">
-        <i class="fas fa-bars"></i>
-      </div>
     </header>
 
-    <main id="homepage">
-      <div class="hero">
-        <div class="info_inicio">
-          <h1 class="alt-font">Bienvenidos</h1>
-          <p>
-            Descubre una nueva forma de estudiar en UNAM INFO, donde la inteligencia artificial y la
-            innovación se unen para brindarte una experiencia educativa única. Aprovecha al máximo nuestras
-            herramientas interactivas y contenido especializado.
-          </p>
-          <button id="inicio-btn" class="alt-font">Iniciar</button>
-        </div>
-      </div>
-
-      <div id="container-cards">
-        <h1 class="title-cards alt-font">Secciones</h1>
-
-        <div class="card">
-          <img src="{{ url_for('static', filename='img/programador.avif') }}" alt="Imagen 1" />
-          <h1>Gestion de ususarios</h1>
-          <p>Gestion y manejo de informacion de usuarios.</p>
-          <a class="btn" href="{{ url_for('usuarios') }}">Usuarios</a>
-        </div>
-
-        <div class="card">
-          <img src="{{ url_for('static', filename='img/practicas.jpeg') }}" alt="Imagen 2" />
-          <h1>Gestion de practicas</h1>
-          <p>Generación y modificacion de practicas.</p>
-          <a class="btn" href="{{ url_for('practicas') }}">Prácticas</a>
-        </div>
-
-        <div class="card">
-          <img src="{{ url_for('static', filename='img/evaluacion.webp') }}" alt="Imagen 3" />
-          <h1>Evaluación de practicas</h1>
-          <p>Resultado de evaluación de las practicas entregadas por el estudiante.</p>
-          <a class="btn" href="{{ url_for('evaluacion') }}">Evaluación</a>
-        </div>
-
-        <div class="card">
-          <img src="{{ url_for('static', filename='img/ayuda.jpg') }}" alt="Imagen 4" />
-          <h1>Sobre nosotros</h1>
-          <p>Mas informacion acerca de nosotros.</p>
-          <a class="btn" href="#container-cards">Mas informacion</a>
-        </div>
+    <main class="animacion" id="login">
+      <div id="login-container">
+        <h2>Iniciar Sesión</h2>
+        <form action="{{ url_for('login') }}" method="POST">
+          <div class="form-group">
+            <label for="numero_cuenta">Número de Cuenta:</label>
+            <input type="text" id="numero_cuenta" name="numero_cuenta" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" class="form-input" required />
+          </div>
+          <button type="submit" id="form-btn" class="alt-font">Iniciar Sesión</button>
+        </form>
+        <p>¿No tienes una cuenta? <a href="{{ url_for('registro') }}">Regístrate aquí</a></p>
       </div>
     </main>
-
-    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
   </body>
 </html>

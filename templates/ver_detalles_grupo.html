@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalles del Grupo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+    <header>
+        <!-- Aquí va tu código de encabezado -->
+    </header>
+
+    <main>
+        <h2>Detalles del Grupo: {{ grupo.nombre }}</h2>
+        <p>Descripción: {{ grupo.descripcion }}</p>
+        <h3>Estudiantes Inscritos:</h3>
+        <ul>
+            {% for estudiante in estudiantes %}
+            <li>{{ estudiante.nombre }}</li>
+            {% endfor %}
+        </ul>
+    </main>
+</body>
+</html>

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Prácticas</title>
+    <title>Prácticas | IntelliTutor UNAM</title>
+    <meta name="description" content="Gestión de prácticas académicas para profesores y estudiantes de la UNAM">
     <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,6 +13,1163 @@
       href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Josefin+Slab:wght@100..700&display=swap"
       rel="stylesheet" />
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+      :root {
+        --card-hover-transform: translateY(-8px);
+        --card-transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        --form-focus-glow: 0 0 0 3px rgba(0, 61, 121, 0.15);
+        --header-gradient: linear-gradient(135deg, var(--azul-unam-l1), var(--azul-unam));
+        --card-shadow-hover: 0 15px 30px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+        --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+        --btn-shadow-hover: 0 10px 20px rgba(0, 0, 0, 0.1), 0 3px 6px rgba(0, 0, 0, 0.05);
+        --btn-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        --border-glow: 0 0 0 2px rgba(0, 61, 121, 0.2);
+      }
+
+      #practicas {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: var(--space-xl) var(--space-md);
+        position: relative;
+        min-height: calc(100vh - 200px);
+      }
+
+      .practicas-header {
+        text-align: center;
+        margin-bottom: var(--space-xl);
+        position: relative;
+        animation: fadeInDown 0.8s ease-out;
+      }
+
+      @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .practicas-header h1 {
+        font-size: 2.5rem;
+        color: var(--azul-unam);
+        margin-bottom: var(--space-md);
+        font-weight: 800;
+        position: relative;
+        display: inline-block;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .practicas-header h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--azul-unam), var(--gold-unam));
+        border-radius: 2px;
+        animation: expandWidth 1s ease-out forwards;
+      }
+
+      @keyframes expandWidth {
+        from { width: 0; }
+        to { width: 80px; }
+      }
+
+      .practicas-header p {
+        color: var(--gray-600);
+        max-width: 700px;
+        margin: 1rem auto;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        animation: fadeIn 1s ease-out 0.3s forwards;
+        opacity: 0;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .practicas-tabs {
+        display: flex;
+        justify-content: center;
+        margin-bottom: var(--space-xl);
+        position: relative;
+        z-index: 1;
+        background-color: var(--white);
+        border-radius: 50px;
+        padding: 0.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        animation: fadeIn 0.8s ease-out 0.5s forwards;
+        opacity: 0;
+      }
+
+      .practicas-tab {
+        padding: 0.8rem 1.5rem;
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--gray-600);
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        border: none;
+        background: none;
+        font-size: 1rem;
+        border-radius: 50px;
+        flex: 1;
+        justify-content: center;
+        white-space: nowrap;
+        z-index: 2;
+      }
+
+      .practicas-tab:hover {
+        color: var(--azul-unam);
+      }
+
+      .practicas-tab.active {
+        color: var(--white);
+        background-color: var(--azul-unam);
+        box-shadow: 0 4px 10px rgba(0, 61, 121, 0.3);
+      }
+
+      .practicas-tab i {
+        font-size: 1.1rem;
+        transition: transform 0.3s ease;
+      }
+
+      .practicas-content {
+        display: none;
+        animation: fadeInUp 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transform-origin: center top;
+      }
+
+      .practicas-content.active {
+        display: block;
+      }
+
+      @keyframes fadeInUp {
+        from { opacity: 0 }
+        to { opacity: 1 }
+      }
+
+      #form-container {
+        background-color: var(--white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--card-shadow);
+        padding: var(--space-xl);
+        margin-bottom: var(--space-xl);
+        position: relative;
+        overflow: hidden;
+        transition: box-shadow 0.3s ease;
+      }
+
+      #form-container:hover {
+        box-shadow: var(--card-shadow-hover);
+      }
+
+      #form-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: var(--gold-unam);
+      }
+
+      #form-container h2 {
+        color: var(--azul-unam);
+        margin-bottom: var(--space-lg);
+        font-size: 1.8rem;
+        position: relative;
+        display: inline-block;
+        font-weight: 700;
+      }
+
+      #form-container h2::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background-color: var(--gold-unam);
+        border-radius: 2px;
+      }
+
+      #practica-gen-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: var(--space-xxl);
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xs);
+        position: relative;
+        transition: transform 0.3s ease;
+      }
+
+      .form-group:hover {
+        transform: translateY(-1px);
+      }
+
+      .form-group label {
+        font-weight: 600;
+        color: var(--gray-700);
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        transition: color 0.3s ease;
+      }
+
+      .form-group:focus-within label {
+        color: var(--azul-unam);
+      }
+
+      .form-group label i {
+        color: var(--azul-unam);
+        font-size: 0.9rem;
+      }
+
+      .form-input {
+        padding: 0.85rem 1rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: var(--white);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--azul-unam);
+        box-shadow: var(--form-focus-glow);
+      }
+
+      .form-input::placeholder {
+        color: var(--gray-400);
+        opacity: 0.7;
+      }
+
+      textarea.form-input {
+        min-height: 120px;
+        resize: vertical;
+        line-height: 1.5;
+      }
+
+      #form-btn-container {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: center;
+        margin-top: var(--space-lg);
+      }
+
+      #form-btn {
+        background: linear-gradient(135deg, var(--azul-unam), var(--azul-unam-d1));
+        color: var(--white);
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: var(--radius-md);
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        box-shadow: var(--btn-shadow);
+        width: 100%;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #form-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: all 0.6s ease;
+      }
+
+      #form-btn:hover {
+        background: linear-gradient(135deg, var(--azul-unam-d1), var(--azul-unam-d2));
+        transform: translateY(-3px);
+        box-shadow: var(--btn-shadow-hover);
+      }
+
+      #form-btn:hover::before {
+        left: 100%;
+      }
+
+      #form-btn:active {
+        transform: translateY(0);
+        box-shadow: var(--btn-shadow);
+      }
+
+      #form-btn i {
+        font-size: 1.2rem;
+        transition: transform 0.3s ease;
+      }
+
+      #form-btn:hover i {
+        transform: rotate(90deg);
+      }
+
+      .practicas-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+        align-items: center;
+      }
+
+      .busqueda-container {
+        flex: 1;
+        position: relative;
+        min-width: 250px;
+      }
+
+      .busqueda-input {
+        width: 100%;
+        padding: 0.85rem 1rem 0.85rem 2.8rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+
+      .busqueda-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-500);
+        transition: all 0.3s ease;
+      }
+
+      .busqueda-input:focus {
+        outline: none;
+        border-color: var(--azul-unam);
+        box-shadow: var(--form-focus-glow);
+      }
+
+      .busqueda-input:focus + .busqueda-icon {
+        color: var(--azul-unam);
+        transform: translateY(-50%) scale(1.2);
+      }
+      
+
+      .filtro-container {
+    display: flex;
+    opacity: 0.1;
+    position: fixed;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.5s ease-in-out;
+    gap: var(--space-xs);
+    background-color: var(--white);
+    border: 1px solid var(--gray-300);
+    border-radius: 50px;
+    padding: 0.3rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    animation: pulseGlowFilter 3s infinite;
+}
+
+.filtro-container:hover {
+    opacity: 1;
+    animation: none; 
+    transition: opacity 0.5s ease-in-out;
+}
+
+.filtro-container:not(:hover) {
+    animation: pulseGlowFilter 3s infinite; 
+}
+
+@keyframes pulseGlowFilter {
+    0% { box-shadow: 0 0 0 0 rgba(0, 61, 121, 0.1); opacity: 0.1; }
+    50% { box-shadow: 0 0 20px 5px rgba(0, 61, 121, 0.1); opacity: 0.35; }
+    100% { box-shadow: 0 0 0 0 rgba(0, 61, 121, 0.1); opacity: 0.1; }
+}
+
+
+
+      .filtro-btn {
+        background: none;
+        border: none;
+        padding: 0.6rem 1rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        font-weight: 500;
+      }
+
+      .filtro-btn.active {
+        background-color: var(--azul-unam);
+        color: var(--white);
+        box-shadow: 0 2px 5px rgba(0, 61, 121, 0.3);
+      }
+
+      .filtro-btn:hover:not(.active) {
+        background-color: var(--gray-100);
+        transform: translateY(-1px);
+      }
+
+      .filtro-btn i {
+        font-size: 0.9rem;
+        transition: transform 0.3s ease;
+      }
+
+      .filtro-btn:hover i {
+        transform: scale(1.2);
+      }
+
+      .practicas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: var(--space-lg);
+        perspective: 1000px;
+      }
+
+      .practica-card {
+        background-color: var(--white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: var(--card-transition);
+        border-top: 3px solid var(--azul-unam);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+        animation: cardFadeIn 0.5s ease-in-out;
+        animation-fill-mode: both;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+      }
+
+      @keyframes cardFadeIn {
+        from { opacity: 0; transform: translateY(30px) rotateX(5deg); }
+        to { opacity: 1; transform: translateY(0) rotateX(0); }
+      }
+
+      .practica-card:hover {
+        transform: var(--card-hover-transform);
+        box-shadow: var(--card-shadow-hover);
+        border-top-color: var(--gold-unam);
+      }
+
+      .practica-card-header {
+        padding: var(--space-md) var(--space-lg);
+        background: var(--header-gradient);
+        color: var(--white);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .practica-card-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+
+      .practica-card:hover .practica-card-header::before {
+        opacity: 1;
+      }
+
+      .practica-card-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 2.8rem;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .practica-card-body {
+        padding: var(--space-lg);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+        position: relative;
+        z-index: 1;
+      }
+
+      .practica-card-body::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23003D79' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+        opacity: 0.5;
+        z-index: -1;
+      }
+
+      .practica-info {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+        position: relative;
+        z-index: 1;
+      }
+
+      .practica-info-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        font-size: 0.95rem;
+        color: var(--gray-700);
+        transition: transform 0.3s ease;
+      }
+
+      .practica-card:hover .practica-info-item {
+        transform: translateX(3px);
+      }
+
+      .practica-info-item i {
+        color: var(--azul-unam);
+        width: 16px;
+        text-align: center;
+        transition: transform 0.3s ease;
+      }
+
+      .practica-card:hover .practica-info-item i {
+        transform: scale(1.2);
+      }
+
+      .practica-info-item strong {
+        font-weight: 600;
+        color: var(--gray-800);
+      }
+
+      .practica-estado {
+        position: relative;
+        top: var(--space-xs);
+        right: var(--space-sm);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        z-index: 2;
+        transition: all 0.3s ease;
+      }
+
+      .practica-card:hover .practica-estado {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .estado-activo {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.2);
+      }
+
+      .estado-pendiente {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+        border: 1px solid rgba(255, 193, 7, 0.2);
+      }
+
+      .estado-finalizado {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        border: 1px solid rgba(13, 110, 253, 0.2);
+      }
+
+      .practica-card-footer {
+        padding: var(--space-md);
+        border-top: 1px solid var(--gray-200);
+        background-color: var(--gray-50);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.3s ease;
+      }
+
+      .practica-card:hover .practica-card-footer {
+        background-color: var(--gray-100);
+      }
+
+      .practica-actions {
+        display: flex;
+        gap: var(--space-sm);
+      }
+
+      .btn-action {
+        background-color: var(--white);
+        border: 1px solid var(--gray-300);
+        color: var(--gray-700);
+        padding: 0.5rem;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-action::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, transparent 70%);
+        transform: scale(0);
+        opacity: 0;
+        transition: all 0.5s ease;
+      }
+
+      .btn-action:hover::before {
+        transform: scale(2);
+        opacity: 1;
+      }
+
+      .btn-action:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        z-index: 1;
+      }
+
+      .btn-action i {
+        position: relative;
+        z-index: 2;
+        transition: transform 0.3s ease;
+      }
+
+      .btn-action:hover i {
+        transform: scale(1.2);
+      }
+
+      .btn-view {
+        color: var(--azul-unam);
+        border-color: var(--azul-unam-l1);
+      }
+
+      .btn-view:hover {
+        background-color: rgba(0, 61, 121, 0.1);
+        border-color: var(--azul-unam);
+      }
+
+      .btn-delete {
+        color: #dc3545;
+        border-color: rgba(220, 53, 69, 0.3);
+      }
+
+      .btn-delete:hover {
+        background-color: rgba(220, 53, 69, 0.1);
+        border-color: #dc3545;
+      }
+
+      .practica-fecha {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        font-size: 0.9rem;
+        color: var(--gray-600);
+        transition: transform 0.3s ease;
+      }
+
+      .practica-card:hover .practica-fecha {
+        transform: translateY(-2px);
+      }
+
+      .practica-fecha i {
+        color: var(--gold-unam);
+        transition: transform 0.3s ease;
+      }
+
+      .practica-card:hover .practica-fecha i {
+        transform: scale(1.2);
+      }
+
+      .practicas-grid .practica-card {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      .practicas-grid.loaded .practica-card {
+        animation: cardAppear 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      }
+
+      @keyframes cardAppear {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .practicas-grid.loaded .practica-card:nth-child(1) { animation-delay: 0.1s; }
+      .practicas-grid.loaded .practica-card:nth-child(2) { animation-delay: 0.15s; }
+      .practicas-grid.loaded .practica-card:nth-child(3) { animation-delay: 0.2s; }
+      .practicas-grid.loaded .practica-card:nth-child(4) { animation-delay: 0.25s; }
+      .practicas-grid.loaded .practica-card:nth-child(5) { animation-delay: 0.3s; }
+      .practicas-grid.loaded .practica-card:nth-child(6) { animation-delay: 0.35s; }
+      .practicas-grid.loaded .practica-card:nth-child(7) { animation-delay: 0.4s; }
+      .practicas-grid.loaded .practica-card:nth-child(8) { animation-delay: 0.45s; }
+      .practicas-grid.loaded .practica-card:nth-child(9) { animation-delay: 0.5s; }
+
+      .no-practicas {
+        padding: var(--space-xl);
+        text-align: center;
+        position: sticky;
+        top: 80%;
+        left: 50%;
+        transform: translate(-50%, -5%);
+        background-color: var(--white);
+        border-radius: var(--radius-lg);
+        color: var(--gray-600);
+        font-size: 1.1rem;
+        margin: var(--space-md) 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--space-md);
+        box-shadow: var(--card-shadow);
+        transition: opacity 0.3s ease-out;
+        border: 1px dashed var(--gray-300);
+        animation: pulseGlow 3s infinite;
+      }
+
+      @keyframes pulseGlow {
+        0% { box-shadow: 0 0 0 0 rgba(0, 61, 121, 0.1); }
+        50% { box-shadow: 0 0 20px 5px rgba(0, 61, 121, 0.1); }
+        100% { box-shadow: 0 0 0 0 rgba(0, 61, 121, 0.1); }
+      }
+
+      .no-practicas:hover {
+        box-shadow: var(--card-shadow-hover);
+      }
+
+      .no-practicas i {
+        font-size: 3.5rem;
+        color: var(--azul-unam-l1);
+        margin-bottom: var(--space-sm);
+        animation: floatIcon 3s ease-in-out infinite;
+      }
+
+      @keyframes floatIcon {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0); }
+      }
+
+      .no-practicas p {
+        max-width: 400px;
+        line-height: 1.6;
+      }
+
+      .no-practicas button {
+        background: var(--header-gradient);
+        color: var(--white);
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: var(--btn-shadow);
+        margin-top: var(--space-sm);
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+      }
+
+      .no-practicas button:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--btn-shadow-hover);
+      }
+
+      .no-practicas button i {
+        font-size: 1rem;
+        color: var(--white);
+        animation: none;
+        margin: 0;
+      }
+
+      .tooltip {
+        position: relative;
+        display: inline-block;
+      }
+
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: var(--gray-800);
+        color: var(--white);
+        text-align: center;
+        border-radius: 6px;
+        padding: 6px 10px;
+        position: absolute;
+        z-index: 10;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-size: 0.8rem;
+        pointer-events: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        font-weight: 500;
+      }
+
+      .tooltip .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -6px;
+        border-width: 6px;
+        border-style: solid;
+        border-color: var(--gray-800) transparent transparent transparent;
+      }
+
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .switch-container {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 54px;
+        height: 28px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--gray-300);
+        transition: .4s;
+        border-radius: 28px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border-radius: 50%;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      input:checked + .slider {
+        background-color: var(--azul-unam);
+      }
+
+      input:focus + .slider {
+        box-shadow: 0 0 1px var(--azul-unam);
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      .switch-label {
+        font-weight: 600;
+        color: var(--gray-700);
+        font-size: 0.95rem;
+        transition: color 0.3s ease;
+      }
+
+      input:checked ~ .switch-label {
+        color: var(--azul-unam);
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-container {
+        background-color: var(--white);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        width: 90%;
+        max-width: 500px;
+        padding: var(--space-xl);
+        transform: scale(0.9) translateY(30px);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border-top: 4px solid #dc3545;
+      }
+
+      .modal-overlay.active .modal-container {
+        transform: scale(1) translateY(0);
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: var(--space-lg);
+        color: #dc3545;
+      }
+
+      .modal-header i {
+        font-size: 2rem;
+        margin-right: var(--space-md);
+        animation: pulse 2s infinite;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      .modal-body {
+        margin-bottom: var(--space-xl);
+        color: var(--gray-700);
+        font-size: 1.1rem;
+        line-height: 1.6;
+      }
+
+      .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--space-md);
+      }
+
+      .modal-btn {
+        padding: 0.8rem 1.5rem;
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        font-size: 1rem;
+      }
+
+      .modal-btn-cancel {
+        background-color: var(--gray-200);
+        color: var(--gray-700);
+        border: none;
+      }
+
+      .modal-btn-cancel:hover {
+        background-color: var(--gray-300);
+        transform: translateY(-2px);
+      }
+
+      .modal-btn-confirm {
+        background-color: #dc3545;
+        color: var(--white);
+        border: none;
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+      }
+
+      .modal-btn-confirm:hover {
+        background-color: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4);
+      }
+
+      @media (max-width: 1200px) {
+        .practicas-grid {
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .practicas-header h1 {
+          font-size: 2.2rem;
+        }
+        
+        #practica-gen-form {
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+      }
+
+      @media (max-width: 768px) {
+        .practicas-header h1 {
+          font-size: 1.8rem;
+        }
+        
+        .practicas-header p {
+          font-size: 1rem;
+        }
+        
+        .practicas-grid {
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        }
+        
+        .practicas-controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        
+        .filtro-container {
+          width: 100%;
+          justify-content: center;
+          overflow-x: auto;
+          padding: 0.3rem;
+        }
+        
+        .filtro-btn {
+          padding: 0.6rem 0.8rem;
+          font-size: 0.85rem;
+          white-space: nowrap;
+        }
+        
+        .practicas-tabs {
+          max-width: 100%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #practicas {
+          padding: var(--space-md) var(--space-sm);
+        }
+        
+        .practicas-header h1 {
+          font-size: 1.6rem;
+        }
+        
+        .practicas-tab {
+          padding: 0.7rem 1rem;
+          font-size: 0.9rem;
+        }
+        
+        #form-container {
+          padding: var(--space-md);
+        }
+        
+        .practica-card-header h3 {
+          font-size: 1.1rem;
+        }
+        
+        .practica-info-item {
+          font-size: 0.85rem;
+        }
+        
+        .modal-container {
+          padding: var(--space-md);
+        }
+        
+        .modal-header h3 {
+          font-size: 1.3rem;
+        }
+        
+        .modal-body {
+          font-size: 1rem;
+        }
+        
+        .modal-btn {
+          padding: 0.7rem 1.2rem;
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
+
+      .altura {
+        width: 100vw;
+        height: 100vh;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--azul-unam);
+        outline-offset: 2px;
+      }
+
+      /* @media (prefers-color-scheme: dark) {
+        .dark-mode-styles {
+        }
+      } */
+    </style>
   </head>
   <body>
     <header>
@@ -24,12 +1183,14 @@
       <div class="menu">
         <div class="header-btns">
           <a href="{{ url_for('index') }}" class="btn alt-font">Inicio</a>
-          <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
           <a href="{{ url_for('evaluacion') }}" class="btn alt-font">Evaluación</a>
+          {% if rol == 'administrador' %}
+          <a href="{{ url_for('gestionar_solicitudes') }}" class="btn alt-font">Solicitudes</a>
+          {% endif %}
+          <a href="{{ url_for('admin_usuarios' if rol == 'administrador' else 'profesor_usuarios') }}" class="btn alt-font">Usuarios</a>
         </div>
         <div class="user-menu">
-          <a href="" id="regis" class="btn alt-font">Registrarse</a>
-          <a href="" id="login" class="btn alt-font">Iniciar sesión</a>
+          <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
         </div>
       </div>
 
@@ -39,117 +1200,547 @@
     </header>
 
     <main id="practicas">
-      <!-- Formulario -->
-      <div id="form-container">
-        <h2 class="alt-font">Agregar Práctica</h2>
-        <form action="{{ url_for('practicas') }}" method="POST" id="practica-gen-form">
-          <div class="form-group">
-            <label for="titulo">Título:</label>
-            <input type="text" id="titulo" name="titulo" class="form-input" required />
-          </div>
-
-          <div class="form-group">
-            <label for="materia_id">Materia:</label>
-            <select id="materia_id" name="materia_id" class="form-input" required>
-              {% for materia in materias %}
-              <option value="{{ materia.id }}">{{ materia.nombre }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="nivel_id">Nivel:</label>
-            <select id="nivel_id" name="nivel_id" class="form-input" required>
-              {% for nivel in niveles %}
-              <option value="{{ nivel.id }}">{{ nivel.nombre }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="autor_id">Autor:</label>
-            <select id="autor_id" name="autor_id" class="form-input" required>
-              {% for autorizado in autorizados %}
-              <option value="{{ autorizado.id }}">{{ autorizado.nombre }} - {{ autorizado.rol }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="objetivo">Objetivo:</label>
-            <textarea id="objetivo" name="objetivo" class="form-input" required></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="fecha_entrega">Fecha de Entrega:</label>
-            <input type="date" id="fecha_entrega" name="fecha_entrega" class="form-input" required />
-          </div>
-
-          <div class="form-group">
-            <label for="tiempo_estimado">Tiempo Estimado (horas):</label>
-            <input type="number" id="tiempo_estimado" name="tiempo_estimado" class="form-input" required />
-          </div>
-
-          <div class="form-group">
-            <label for="concepto_id">Concepto:</label>
-            <select id="concepto_id" name="concepto_id" class="form-input" required>
-              {% for concepto in conceptos %}
-              <option value="{{ concepto.id }}">{{ concepto.nombre }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="herramienta_id">Herramienta:</label>
-            <select id="herramienta_id" name="herramienta_id" class="form-input" required>
-              {% for herramienta in herramientas %}
-              <option value="{{ herramienta.id }}">{{ herramienta.nombre }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <button type="submit" id="form-btn" class="alt-font">Agregar</button>
-        </form>
+      <div class="practicas-header">
+        <h1 class="alt-font">Gestión de Prácticas</h1>
+        <p>Crea y administra prácticas para tus estudiantes de manera eficiente y profesional.</p>
+      </div>
+      <div class="busqueda-container">
+        <input type="text" class="busqueda-input" id="busquedaPracticas" placeholder="Buscar por título o materia...">
+        <i class="fas fa-search busqueda-icon"></i>
+      </div>
+      <div class="practicas-tabs">
+        <button class="practicas-tab active" data-tab="list-container" aria-pressed="true">
+          <i class="fas fa-list-ul"></i> Lista de Prácticas
+        </button>
+        <button class="practicas-tab" data-tab="form-container" aria-pressed="false">
+          <i class="fas fa-plus-circle"></i> Agregar Práctica
+        </button>
       </div>
 
-      <!-- Table -->
-      <div id="table-container">
-        <h2 class="alt-font">Lista de Prácticas</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Título</th>
-              <th>Materia</th>
-              <th>Fecha de Entrega</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for practica in practicas %}
-            <tr>
-              <td>{{ practica.id }}</td>
-              <td>
-                <a href="{{ url_for('ver_practica', practica_id=practica.id) }}">{{ practica.titulo }}</a>
-              </td>
-              <td>{{ practica.nombre_materia }}</td>
-              <td>{{ practica.fecha_entrega.strftime('%Y-%m-%d') }}</td>
-              <td>{{ practica.estado }}</td>
-              <td>
-                <form
-                  action="{{ url_for('eliminar_practica', practica_id=practica.id) }}"
-                  method="POST"
-                  id="table-reg-form">
-                  <button type="submit" id="eliminar-reg-btn">Eliminar</button>
-                </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <!-- Formulario -->
+      <div id="form-container" class="practicas-content" aria-hidden="true">
+        <h2 class="alt-font">Nueva Práctica</h2>
+        <form action="{{ url_for('practicas') }}" method="POST" id="practica-gen-form">
+            <div class="form-group">
+                <label for="titulo"><i class="fas fa-heading"></i> Título:</label>
+                <input type="text" id="titulo" name="titulo" class="form-input" required placeholder="Ej: Introducción a Algoritmos" />
+            </div>
+    
+            <div class="form-group">
+                <label for="grupo_id">Grupo:</label>
+                <select id="grupo_id" name="grupo_id" class="form-input" required>
+                    {% for grupo in grupos %}
+                    <option value="{{ grupo.id }}">{{ grupo.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <div class="form-group">
+                <label for="nivel_id"><i class="fas fa-layer-group"></i> Nivel:</label>
+                <select id="nivel_id" name="nivel_id" class="form-input" required>
+                    {% for nivel in niveles %}
+                    <option value="{{ nivel.id }}">{{ nivel.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <div class="form-group">
+                {% if rol == 'administrador' %}
+                <label for="autor_id"><i class="fas fa-user-edit"></i> Autor:</label>
+                <select id="autor_id" class="form-input" name="autor_id" required>
+                    <option value="">Seleccione un autor</option>
+                    {% for autorizado in autorizados %}
+                    <option value="{{ autorizado.id }}">{{ autorizado.nombre }}</option>
+                    {% endfor %}
+                </select>
+                {% elif rol == 'profesor' %}
+                <label for="autor"><i class="fas fa-user-edit"></i> Autor:</label>
+                <input type="hidden" name="autor_id" class="form-input" value="{{ session['usuario_id'] }}">
+                <input type="text" id="autor" class="form-input" name="autor" value="{{ usuario_nombre }}" readonly>
+                {% endif %}
+            </div>
+    
+            <div class="form-group">
+                <label for="objetivo"><i class="fas fa-bullseye"></i> Objetivo:</label>
+                <textarea id="objetivo" name="objetivo" class="form-input" required placeholder="Describe el objetivo principal de esta práctica..."></textarea>
+            </div>
+    
+            <div class="form-group">
+                <label for="materia_id">Materia:</label>
+                <select id="materia_id" name="materia_id" class="form-input" required>
+                    {% for materia in materias %}
+                    <option value="{{ materia.id }}">{{ materia.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <div class="form-group">
+                <label for="fecha_entrega"><i class="fas fa-calendar-alt"></i> Fecha de Entrega:</label>
+                <input type="date" id="fecha_entrega" name="fecha_entrega" class="form-input" required />
+            </div>
+    
+            <div class="form-group">
+                <label for="tiempo_estimado"><i class="fas fa-clock"></i> Tiempo Estimado (horas):</label>
+                <input type="number" id="tiempo_estimado" name="tiempo_estimado" class="form-input" required min="1" max="100" />
+            </div>
+    
+            <div class="form-group">
+                <label for="concepto_id"><i class="fas fa-lightbulb"></i> Concepto:</label>
+                <select id="concepto_id" name="concepto_id" class="form-input" required>
+                    {% for concepto in conceptos %}
+                    <option value="{{ concepto.id }}">{{ concepto.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <div class="form-group">
+                <label for="herramienta_id"><i class="fas fa-tools"></i> Herramienta:</label>
+                <select id="herramienta_id" name="herramienta_id" class="form-input" required>
+                    {% for herramienta in herramientas %}
+                    <option value="{{ herramienta.id }}">{{ herramienta.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <div class="form-group">
+                <label for="uso_ia"><i class="fas fa-robot"></i> ¿Calificación automática con IA?</label>
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="uso_ia_switch" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <input type="hidden" id="uso_ia" name="uso_ia" value="1">
+                    <span class="switch-label" id="uso_ia_label">Activado</span>
+                </div>
+            </div>
+    
+            <div id="form-btn-container">
+                <button type="submit" id="form-btn" class="alt-font">
+                    <i class="fas fa-plus-circle"></i> Crear Nueva Práctica
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="practicas-grid">
+      {% if practicas and practicas|length > 0 %}
+          {% for practica in practicas %}
+          <div class="practica-card" data-estado="{{ practica.estado.lower() }}">
+              <div class="practica-card-header">
+                  <h3>{{ practica.titulo }}</h3>
+              </div>
+              <div class="practica-card-body">
+                  <div class="practica-info">
+                      <div class="practica-info-item">
+                          <i class="fas fa-book"></i>
+                          <span><strong>Materia:</strong> {{ practica.nombre_materia }}</span>
+                      </div>
+                      <div class="practica-info-item">
+                          <i class="fas fa-users"></i>
+                          <span><strong>Clase:</strong> {{ nombre_clase }}</span>  
+                      </div>
+                      <div class="practica-info-item">
+                          <i class="fas fa-hashtag"></i>
+                          <span><strong>ID:</strong> {{ practica.id }}</span>
+                      </div>
+                  </div>
+              </div>
+              <div class="practica-card-footer">
+                  <div class="practica-fecha">
+                      <i class="fas fa-calendar-day"></i>
+                      <span>{{ practica.fecha_entrega.strftime('%Y-%m-%d') }}</span>
+                  </div>
+                  <div class="practica-actions">
+                      <a href="{{ url_for('ver_practica', practica_id=practica.id) }}" class="btn-action btn-view tooltip" aria-label="Ver detalles">
+                          <i class="fas fa-eye"></i>
+                          <span class="tooltiptext">Ver detalles</span>
+                      </a>
+                      <button class="btn-action btn-delete tooltip" onclick="confirmarEliminar('{{ practica.id }}')" aria-label="Eliminar práctica">
+                          <i class="fas fa-trash-alt"></i>
+                          <span class="tooltiptext">Eliminar</span>
+                      </button>
+                  </div>
+              </div>
+          </div>
+          {% endfor %}
+      {% else %}
+          <div class="no-practicas">
+              <i class="fas fa-clipboard-list"></i>
+              <p>No hay prácticas disponibles. ¡Crea tu primera práctica para comenzar a gestionar tus actividades académicas!</p>
+              <button class="practicas-tab-btn" data-tab="form-container">
+                  <i class="fas fa-plus-circle"></i> Crear Práctica
+              </button>
+          </div>
+      {% endif %}
+  </div>
+      </div>
+      <div id="list-container" class="practicas-content active" aria-hidden="false">
+        <div class="practicas-controls">
+          
+          
+          <div class="filtro-container">
+            <button class="filtro-btn active" data-filter="todos" aria-pressed="true"><i class="fas fa-th-large"></i> Todos</button>
+            <button class="filtro-btn" data-filter="activo" aria-pressed="false"><i class="fas fa-check-circle"></i> Activos</button>
+            <button class="filtro-btn" data-filter="pendiente" aria-pressed="false"><i class="fas fa-clock"></i> Pendientes</button>
+            <button class="filtro-btn" data-filter="finalizado" aria-pressed="false"><i class="fas fa-flag-checkered"></i> Finalizados</button>
+          </div>
+        </div>
+
+      <div class="modal-overlay" id="modal-eliminar" aria-hidden="true">
+        <div class="modal-container" role="dialog" aria-labelledby="modal-title">
+          <div class="modal-header">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3 id="modal-title">Confirmar eliminación</h3>
+          </div>
+          <div class="modal-body">
+            <p>¿Estás seguro de que deseas eliminar esta práctica? Esta acción no se puede deshacer y eliminará todos los datos asociados.</p>
+          </div>
+          <div class="modal-footer">
+            <button class="modal-btn modal-btn-cancel" onclick="cerrarModal()">Cancelar</button>
+            <form id="form-eliminar" action="" method="POST" style="display: inline;">
+              <button type="submit" class="modal-btn modal-btn-confirm">Eliminar</button>
+            </form>
+          </div>
+        </div>
       </div>
     </main>
-    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+    <footer>
+      <p>&copy; 2025 IntelliTutor UNAM - Todos los derechos reservados</p>
+      <div class="footer-links">
+          <a href="#">Política de Privacidad</a>
+          <a href="#">Términos y Condiciones</a>
+      </div>
+      <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-linkedin-in"></i></a>
+      </div>
+  </footer>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const burgerMenu = document.querySelector('.burger-menu');
+          const menu = document.querySelector('.menu');
+          
+          if (burgerMenu) {
+              burgerMenu.addEventListener('click', function() {
+                  menu.classList.toggle('active');
+              });
+          }
+          
+          initTabs();
+          
+          initFiltros();
+          
+          initBusqueda();
+          
+          initIASwitch();
+          
+          initCrearPracticaBtn();
+          
+          setTimeout(() => {
+              document.querySelector('.practicas-grid').classList.add('loaded');
+          }, 100);
+          
+          const fechaEntrega = document.getElementById('fecha_entrega');
+          if (fechaEntrega) {
+              const hoy = new Date();
+              const yyyy = hoy.getFullYear();
+              const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+              const dd = String(hoy.getDate()).padStart(2, '0');
+              const fechaMinima = `${yyyy}-${mm}-${dd}`;
+              fechaEntrega.min = fechaMinima;
+              fechaEntrega.value = fechaMinima;
+          }
+      });
+      
+      function initTabs() {
+          const tabs = document.querySelectorAll('.practicas-tab');
+          
+          tabs.forEach(tab => {
+              tab.addEventListener('click', function() {
+                  tabs.forEach(t => {
+                      t.classList.remove('active');
+                      t.setAttribute('aria-pressed', 'false');
+                  });
+                  
+                  this.classList.add('active');
+                  this.setAttribute('aria-pressed', 'true');
+                  
+                  document.querySelectorAll('.practicas-content').forEach(content => {
+                      content.classList.remove('active');
+                      content.setAttribute('aria-hidden', 'true');
+                  });
+                  
+                  const tabId = this.getAttribute('data-tab');
+                  const activeContent = document.getElementById(tabId);
+                  activeContent.classList.add('active');
+                  activeContent.setAttribute('aria-hidden', 'false');
+                  
+                  activeContent.style.animation = 'none';
+                  activeContent.offsetHeight; // Forzar reflow
+                  activeContent.style.animation = 'fadeInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+              });
+              
+              tab.addEventListener('keydown', function(e) {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      this.click();
+                  }
+              });
+          });
+      }
+      
+      function initFiltros() {
+          const filtros = document.querySelectorAll('.filtro-btn');
+          
+          filtros.forEach(filtro => {
+              filtro.addEventListener('click', function() {
+                  filtros.forEach(f => {
+                      f.classList.remove('active');
+                      f.setAttribute('aria-pressed', 'false');
+                  });
+                  
+                  this.classList.add('active');
+                  this.setAttribute('aria-pressed', 'true');
+                  
+                  const tipoFiltro = this.getAttribute('data-filter');
+                  filtrarPracticas(tipoFiltro);
+              });
+          });
+      }
+      
+      function filtrarPracticas(estado) {
+        const cards = document.querySelectorAll('.practica-card');
+        let visibles = 0;
+
+        cards.forEach(card => {
+            if (estado === 'todos') {
+                card.style.display = 'flex';
+                visibles++;
+            } else {
+                const cardEstado = card.getAttribute('data-estado');
+                if (cardEstado === estado) {
+                    card.style.display = 'flex';
+                    visibles++;
+                } else {
+                    card.style.display = 'none';
+                }
+            }
+        });
+
+        const noPracticas = document.querySelector('.no-practicas');
+
+        if (visibles === 0 && !noPracticas) {
+            const grid = document.querySelector('.practicas-grid');
+            const mensaje = document.createElement('div');
+            mensaje.className = 'no-practicas';
+            mensaje.innerHTML = `
+                <i class="fas fa-filter"></i>
+                <p>No hay prácticas que coincidan con el filtro seleccionado.</p>
+                <button class="filtro-btn" data-filter="todos" onclick="resetFiltros()">
+                    <i class="fas fa-sync-alt"></i> Ver todas
+                </button>
+            `;
+            grid.appendChild(mensaje);
+        } else if (visibles > 0 && noPracticas) {
+            noPracticas.remove();
+        }
+    }
+      
+      function resetFiltros() {
+          document.querySelector('.filtro-btn[data-filter="todos"]').click();
+      }
+      
+      function initBusqueda() {
+    const busquedaInput = document.getElementById('busquedaPracticas');
+    
+    if (busquedaInput) {
+        let debounceTimeout;
+        
+        busquedaInput.addEventListener('input', function() {
+            clearTimeout(debounceTimeout);
+            
+            debounceTimeout = setTimeout(() => {
+                const termino = this.value.toLowerCase().trim();
+                
+                if (termino.length < 2) {
+                    document.querySelectorAll('.practica-card').forEach(card => {
+                        card.style.display = 'flex';
+                    });
+                    
+                    eliminarMensajeNoPracticas();
+                    eliminarMensajeFiltro();
+                    return;
+                }
+                
+                const cards = document.querySelectorAll('.practica-card');
+                let encontrados = 0;
+                
+                cards.forEach(card => {
+                    const titulo = card.querySelector('.practica-card-header h3').textContent.toLowerCase();
+                    const materia = card.querySelector('.practica-info-item:first-child span').textContent.toLowerCase();
+                    
+                    if (titulo.includes(termino) || materia.includes(termino)) {
+                        card.style.display = 'flex';
+                        encontrados++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                if (encontrados === 0) {
+                    eliminarMensajeFiltro(); 
+                    mostrarMensajeNoPracticas(termino);
+                } else {
+                    eliminarMensajeNoPracticas();
+                }
+            }, 300); 
+        });
+    }
+}
+
+function mostrarMensajeNoPracticas(termino) {
+    const grid = document.querySelector('.practicas-grid');
+    const mensaje = document.createElement('div');
+    mensaje.className = 'no-practicas';
+    mensaje.innerHTML = `
+        <i class="fas fa-search"></i>
+        <p>No se encontraron prácticas que coincidan con "<strong>${termino}</strong>".</p>
+        <button class="filtro-btn" onclick="limpiarBusqueda()">
+            <i class="fas fa-times-circle"></i> Limpiar búsqueda
+        </button>
+    `;
+    grid.appendChild(mensaje);
+}
+
+function eliminarMensajeNoPracticas() {
+    const noPracticas = document.querySelector('.no-practicas');
+    if (noPracticas) {
+        noPracticas.remove();
+    }
+}
+
+function manejarCambioDeSeccion() {
+    eliminarMensajeNoPracticas();
+    eliminarMensajeFiltro();
+}
+
+function mostrarMensajeFiltro() {
+    const grid = document.querySelector('.practicas-grid');
+    const mensaje = document.createElement('div');
+    mensaje.className = 'no-practicas';
+    mensaje.innerHTML = `
+        <i class="fas fa-filter"></i>
+        <p>No hay prácticas que coincidan con el filtro seleccionado.</p>
+        <button class="filtro-btn" onclick="resetFiltros()">
+            <i class="fas fa-sync-alt"></i> Ver todas
+        </button>
+    `;
+    grid.appendChild(mensaje);
+}
+
+function eliminarMensajeFiltro() {
+    const noPracticasFiltro = document.querySelector('.no-practicas');
+    if (noPracticasFiltro) {
+        noPracticasFiltro.remove();
+    }
+}
+
+function limpiarBusqueda() {
+    const busquedaInput = document.getElementById('busquedaPracticas');
+    if (busquedaInput) {
+        busquedaInput.value = '';
+        busquedaInput.focus();
+        busquedaInput.dispatchEvent(new Event('input'));
+    }
+}
+
+document.querySelectorAll('.practicas-tab').forEach(tab => {
+    tab.addEventListener('click', manejarCambioDeSeccion);
+});
+      
+      function initIASwitch() {
+    const switchIA = document.getElementById('uso_ia_switch');
+    const inputIA = document.getElementById('uso_ia');
+    const labelIA = document.getElementById('uso_ia_label');
+    
+    if (switchIA && inputIA && labelIA) {
+        switchIA.addEventListener('change', function() {
+            if (this.checked) {
+                inputIA.value = '1';
+                labelIA.textContent = 'Activado';
+                labelIA.style.color = 'var(--azul-unam)';
+                
+                labelIA.style.animation = 'none';
+                labelIA.offsetHeight; 
+                labelIA.style.animation = 'fadeIn 0.3s ease-out';
+            } else {
+                inputIA.value = '0'; 
+                labelIA.textContent = 'Desactivado';
+                labelIA.style.color = 'var(--gray-700)';
+                
+                labelIA.style.animation = 'none';
+                labelIA.offsetHeight; 
+                labelIA.style.animation = 'fadeIn 0.3s ease-out';
+            }
+        });
+    }
+}
+      
+      function initCrearPracticaBtn() {
+          const btnCrear = document.querySelector('.practicas-tab-btn');
+          
+          if (btnCrear) {
+              btnCrear.addEventListener('click', function() {
+                  const tabId = this.getAttribute('data-tab');
+                  document.querySelector(`.practicas-tab[data-tab="${tabId}"]`).click();
+              });
+          }
+      }
+      
+      function confirmarEliminar(practicaId) {
+          const modal = document.getElementById('modal-eliminar');
+          const form = document.getElementById('form-eliminar');
+          
+          form.action = "{{ url_for('eliminar_practica', practica_id=0) }}".replace('0', practicaId);
+          modal.classList.add('active');
+          modal.setAttribute('aria-hidden', 'false');
+          
+          setTimeout(() => {
+              document.querySelector('.modal-btn-cancel').focus();
+          }, 100);
+          
+          document.body.style.overflow = 'hidden';
+      }
+      
+      function cerrarModal() {
+          const modal = document.getElementById('modal-eliminar');
+          modal.classList.remove('active');
+          modal.setAttribute('aria-hidden', 'true');
+          
+          document.body.style.overflow = '';
+      }
+      
+      window.addEventListener('click', function(event) {
+          const modal = document.getElementById('modal-eliminar');
+          if (event.target === modal) {
+              cerrarModal();
+          }
+      });
+      
+      document.addEventListener('keydown', function(event) {
+          if (event.key === 'Escape') {
+              cerrarModal();
+          }
+      });
+      
+      document.getElementById('practica-gen-form').addEventListener('submit', function(e) {
+          const btn = document.getElementById('form-btn');
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+          btn.disabled = true;
+          
+          this.classList.add('submitting');
+      });
+  </script>
   </body>
 </html>

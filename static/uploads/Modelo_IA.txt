@@ -1,0 +1,1614 @@
+ultima version: <!DOCTYPE html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evaluación de Prácticas</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Josefin+Slab:wght@100..700&display=swap"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+      /* Estilos específicos para la página de evaluación */
+      #evaluacion {
+        padding: var(--space-xl) var(--space-md);
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .evaluacion-header {
+        text-align: center;
+        margin-bottom: var(--space-xl);
+      }
+
+      .evaluacion-header h1 {
+        font-size: 2.5rem;
+        color: var(--azul-unam);
+        margin-bottom: var(--space-md);
+        font-weight: 700;
+        position: relative;
+        display: inline-block;
+      }
+
+      .evaluacion-header h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--azul-unam), var(--gold-unam));
+        border-radius: 2px;
+      }
+
+      .evaluacion-header p {
+        color: var(--gray-600);
+        max-width: 700px;
+        margin: 0 auto;
+        font-size: 1.1rem;
+        line-height: 1.6;
+      }
+
+      /* Estilos para los grupos */
+      .grupos-container {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-lg);
+        margin-bottom: var(--space-xl);
+      }
+
+      .grupo-card {
+        background-color: var(--white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border-top: 3px solid var(--azul-unam);
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .grupo-header {
+        padding: var(--space-md) var(--space-lg);
+        background: linear-gradient(135deg, var(--azul-unam-l1), var(--azul-unam));
+        color: var(--white);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+      }
+
+      .grupo-header:hover {
+        background: linear-gradient(135deg, var(--azul-unam), var(--azul-unam-d1));
+      }
+
+      .grupo-header h2 {
+        font-size: 1.3rem;
+        margin: 0;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+      }
+
+      .grupo-header .badge {
+        background-color: var(--white);
+        color: var(--azul-unam);
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-left: var(--space-sm);
+      }
+
+      .grupo-header .toggle-icon {
+        transition: transform 0.3s ease;
+      }
+
+      .grupo-header.active .toggle-icon {
+        transform: rotate(180deg);
+      }
+
+      .grupo-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease;
+      }
+
+      .grupo-content.active {
+        max-height: 5000px; /* Valor alto para permitir cualquier contenido */
+      }
+
+      .grupo-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--gray-200);
+        background-color: var(--gray-100);
+      }
+
+      .grupo-tab {
+        padding: var(--space-md) var(--space-lg);
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--gray-600);
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+      }
+
+      .grupo-tab:hover {
+        color: var(--azul-unam);
+        background-color: rgba(0, 61, 121, 0.05);
+      }
+
+      .grupo-tab.active {
+        color: var(--azul-unam);
+      }
+
+      .grupo-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: var(--azul-unam);
+      }
+
+      .grupo-tab .count {
+        background-color: var(--azul-unam);
+        color: var(--white);
+        padding: 0.1rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 700;
+      }
+
+      .tab-content {
+        display: none;
+        padding: var(--space-lg);
+      }
+
+      .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease-in-out;
+      }
+
+      /* Estilos para las tablas */
+      .evaluacion-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: var(--space-md);
+        background-color: var(--white);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .evaluacion-table thead {
+        background-color: var(--azul-unam-l1);
+        color: var(--white);
+      }
+
+      .evaluacion-table th {
+        padding: var(--space-md);
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .evaluacion-table td {
+        padding: var(--space-md);
+        border-bottom: 1px solid var(--gray-200);
+        font-size: 0.95rem;
+        color: var(--gray-800);
+        vertical-align: middle;
+      }
+
+      .evaluacion-table tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      .evaluacion-table tbody tr:hover {
+        background-color: rgba(0, 61, 121, 0.03);
+      }
+
+      /* Estilos para los formularios dentro de las tablas */
+      .evaluacion-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      .evaluacion-form textarea, 
+      .evaluacion-form input[type="number"] {
+        padding: 0.6rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        font-size: 0.9rem;
+        transition: all var(--transition-normal);
+        width: 100%;
+      }
+
+      .evaluacion-form textarea {
+        min-height: 80px;
+        resize: vertical;
+      }
+
+      .evaluacion-form textarea:focus, 
+      .evaluacion-form input[type="number"]:focus {
+        outline: none;
+        border-color: var(--azul-unam);
+        box-shadow: 0 0 0 3px rgba(0, 61, 121, 0.1);
+      }
+
+      /* Estilos para los botones */
+      .btn-evaluacion {
+        background-color: var(--azul-unam);
+        color: var(--white);
+        border: none;
+        padding: 0.6rem 1rem;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-xs);
+      }
+
+      .btn-evaluacion:hover {
+        background-color: var(--azul-unam-d1);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+      }
+
+      /* Botón de calificación automática */
+      .btn-auto {
+        background-color: var(--gold-unam);
+        color: var(--black);
+      }
+
+      .btn-auto:hover {
+        background-color: var(--gold-unam-d1);
+      }
+
+      /* Estilos para los estados de evaluación */
+      .estado {
+        font-weight: 600;
+        padding: 0.3rem 0.6rem;
+        border-radius: var(--radius-sm);
+        display: inline-block;
+        font-size: 0.85rem;
+        text-align: center;
+      }
+
+      .estado-pendiente {
+        background-color: rgba(253, 126, 20, 0.1);
+        color: #fd7e14;
+      }
+
+      .estado-evaluado {
+        background-color: rgba(0, 61, 121, 0.1);
+        color: var(--azul-unam);
+      }
+
+      .estado-rechazado {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+      }
+
+      /* Estilos para las calificaciones */
+      .calificacion {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--azul-unam-d1);
+        text-align: center;
+      }
+
+      /* Mensaje de no hay evaluaciones */
+      .no-evaluaciones {
+        padding: var(--space-lg);
+        text-align: center;
+        background-color: var(--gray-100);
+        border-radius: var(--radius-md);
+        color: var(--gray-600);
+        font-size: 1.1rem;
+        margin: var(--space-md) 0;
+      }
+
+      /* Filtros y búsqueda */
+      .filtros-container {
+        display: flex;
+        gap: var(--space-md);
+        margin-bottom: var(--space-xl);
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .filtro-btn {
+        background-color: var(--white);
+        border: 1px solid var(--gray-300);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+      }
+
+      .filtro-btn:hover, .filtro-btn.active {
+        background-color: var(--azul-unam);
+        color: var(--white);
+        border-color: var(--azul-unam);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+
+      .filtro-btn i {
+        font-size: 0.8rem;
+      }
+
+      .busqueda-container {
+        position: relative;
+        margin-bottom: var(--space-xl);
+      }
+
+      .busqueda-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        font-size: 1rem;
+        transition: all var(--transition-normal);
+      }
+
+      .busqueda-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-500);
+        transition: color var(--transition-normal);
+      }
+
+      .busqueda-input:focus {
+        outline: none;
+        border-color: var(--azul-unam);
+        box-shadow: 0 0 0 3px rgba(0, 61, 121, 0.1);
+      }
+
+      .busqueda-input:focus + .busqueda-icon {
+        color: var(--azul-unam);
+      }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        .evaluacion-header h1 {
+          font-size: 2rem;
+        }
+        
+        .grupo-header h2 {
+          font-size: 1.1rem;
+        }
+        
+        .grupo-tab {
+          padding: var(--space-sm) var(--space-md);
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .evaluacion-header h1 {
+          font-size: 1.8rem;
+        }
+        
+        .evaluacion-header p {
+          font-size: 1rem;
+        }
+        
+        .grupo-tabs {
+          flex-wrap: wrap;
+        }
+        
+        .grupo-tab {
+          flex: 1 1 auto;
+          text-align: center;
+          justify-content: center;
+        }
+        
+        .tab-content {
+          padding: var(--space-md);
+        }
+        
+        .table-responsive {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          margin-bottom: var(--space-md);
+        }
+        
+        .evaluacion-table {
+          min-width: 650px;
+        }
+        
+        .evaluacion-table th, 
+        .evaluacion-table td {
+          padding: var(--space-sm);
+          font-size: 0.85rem;
+        }
+        
+        .btn-evaluacion {
+          padding: 0.5rem 0.8rem;
+          font-size: 0.8rem;
+        }
+        
+        .filtros-container {
+          justify-content: flex-start;
+          overflow-x: auto;
+          padding-bottom: var(--space-sm);
+          margin-bottom: var(--space-md);
+        }
+        
+        .filtro-btn {
+          flex: 0 0 auto;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #evaluacion {
+          padding: var(--space-md) var(--space-sm);
+        }
+        
+        .evaluacion-header h1 {
+          font-size: 1.5rem;
+        }
+        
+        .grupo-header {
+          padding: var(--space-sm) var(--space-md);
+        }
+        
+        .grupo-header h2 {
+          font-size: 1rem;
+        }
+        
+        .grupo-tab {
+          padding: var(--space-xs) var(--space-sm);
+          font-size: 0.8rem;
+        }
+        
+        .evaluacion-form textarea, 
+        .evaluacion-form input[type="number"] {
+          padding: 0.5rem;
+          font-size: 0.85rem;
+        }
+      }
+
+      /* Animaciones para las filas de la tabla */
+      @keyframes rowFadeIn {
+        from { opacity: 0; transform: translateX(-10px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+
+      .evaluacion-table tbody tr {
+        animation: rowFadeIn 0.3s ease-in-out;
+        animation-fill-mode: both;
+      }
+
+      .evaluacion-table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+      .evaluacion-table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+      .evaluacion-table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+      .evaluacion-table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+      .evaluacion-table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+      .evaluacion-table tbody tr:nth-child(6) { animation-delay: 0.3s; }
+      .evaluacion-table tbody tr:nth-child(7) { animation-delay: 0.35s; }
+      .evaluacion-table tbody tr:nth-child(8) { animation-delay: 0.4s; }
+      .evaluacion-table tbody tr:nth-child(9) { animation-delay: 0.45s; }
+      .evaluacion-table tbody tr:nth-child(10) { animation-delay: 0.5s; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <a href="/">
+          <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM" />
+          <h1 class="alt-font">IntelliTutor UNAM</h1>
+        </a>
+      </div>
+
+      <div class="menu">
+        <div class="header-btns">
+          <a href="{{ url_for('index') }}" class="btn alt-font">Inicio</a>
+          <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
+          <a href="{{ url_for('admin_usuarios' if rol == 'administrador' else 'profesor_usuarios') }}" class="btn alt-font">Usuarios</a>
+          {% if rol == 'administrador' %}
+          <a href="{{ url_for('gestionar_solicitudes') }}" class="btn alt-font">Solicitudes</a>
+          {% endif %}
+        </div>
+        <div class="user-menu">
+          <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
+        </div>
+      </div>
+
+      <div class="burger-menu">
+        <i class="fas fa-bars"></i>
+      </div>
+    </header>
+    <main id="evaluacion">
+      <div class="evaluacion-header">
+        <h1 class="alt-font">Evaluación de Prácticas</h1>
+        <p>Gestiona y evalúa las prácticas de tus estudiantes organizadas por grupos.</p>
+      </div>
+
+      <div class="busqueda-container">
+        <input type="text" class="busqueda-input" id="busquedaEvaluacion" placeholder="Buscar por nombre de estudiante o práctica...">
+        <i class="fas fa-search busqueda-icon"></i>
+      </div>
+
+      <div class="filtros-container">
+        <button class="filtro-btn active" data-filter="todos"><i class="fas fa-th-large"></i> Todos</button>
+        <button class="filtro-btn" data-filter="pendientes"><i class="fas fa-clock"></i> Pendientes</button>
+        <button class="filtro-btn" data-filter="evaluados"><i class="fas fa-check-circle"></i> Evaluados</button>
+        <button class="filtro-btn" data-filter="recientes"><i class="fas fa-calendar-alt"></i> Más recientes</button>
+      </div>
+
+      <div class="grupos-container">
+        <!-- Grupo 1 -->
+        <div class="grupo-card" data-grupo="A-01">
+          <div class="grupo-header" onclick="toggleGrupo(this)">
+            <h2><i class="fas fa-users"></i> Grupo A-01: Programación Básica <span class="badge">12 evaluaciones</span></h2>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="grupo-content">
+            <div class="grupo-tabs">
+              <div class="grupo-tab active" onclick="cambiarTab(this, 'pendientes-A-01')">
+                <i class="fas fa-clock"></i> Pendientes <span class="count">5</span>
+              </div>
+              <div class="grupo-tab" onclick="cambiarTab(this, 'evaluados-A-01')">
+                <i class="fas fa-check-circle"></i> Evaluados <span class="count">7</span>
+              </div>
+            </div>
+            
+            <!-- Contenido de la pestaña Pendientes -->
+            <div class="tab-content active" id="pendientes-A-01">
+              <div class="table-responsive">
+                <table class="evaluacion-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Estudiante</th>
+                      <th>Práctica</th>
+                      <th>Fecha</th>
+                      <th>Estado</th>
+                      <th>Comentario</th>
+                      <th>Calificación</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>101</td>
+                      <td>Juan Pérez</td>
+                      <td>Práctica 1: Variables</td>
+                      <td>2025-03-15</td>
+                      <td><span class="estado estado-pendiente">Pendiente</span></td>
+                      <td></td>
+                      <td class="calificacion"></td>
+                      <td>
+                        <form class="evaluacion-form" action="{{ url_for('evaluacion') }}" method="POST">
+                          <input type="hidden" name="evaluacion_id" value="101" />
+                          <textarea name="comentario" placeholder="Agregar comentario"></textarea>
+                          <input type="number" name="calificacion" placeholder="Calificación" min="0" max="10" />
+                          <div class="form-actions">
+                            <button type="submit" class="btn-evaluacion"><i class="fas fa-save"></i> Guardar</button>
+                            <button type="button" class="btn-evaluacion btn-auto" onclick="evaluarEntregaAutomatica('101')"><i class="fas fa-robot"></i> Auto</button>
+                          </div>
+                        </form>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>102</td>
+                      <td>María García</td>
+                      <td>Práctica 2: Condicionales</td>
+                      <td>2025-03-16</td>
+                      <td><span class="estado estado-pendiente">Pendiente</span></td>
+                      <td></td>
+                      <td class="calificacion"></td>
+                      <td>
+                        <form class="evaluacion-form" action="{{ url_for('evaluacion') }}" method="POST">
+                          <input type="hidden" name="evaluacion_id" value="102" />
+                          <textarea name="comentario" placeholder="Agregar comentario"></textarea>
+                          <input type="number" name="calificacion" placeholder="Calificación" min="0" max="10" />
+                          <div class="form-actions">
+                            <button type="submit" class="btn-evaluacion"><i class="fas fa-save"></i> Guardar</button>
+                            <button type="button" class="btn-evaluacion btn-auto" onclick="evaluarEntregaAutomatica('102')"><i class="fas fa-robot"></i> Auto</button>
+                          </div>
+                        </form>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- Contenido de la pestaña Evaluados -->
+            <div class="tab-content" id="evaluados-A-01">
+              <div class="table-responsive">
+                <table class="evaluacion-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Estudiante</th>
+                      <th>Práctica</th>
+                      <th>Fecha</th>
+                      <th>Estado</th>
+                      <th>Calificación</th>
+                      <th>Comentario</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>103</td>
+                      <td>Carlos López</td>
+                      <td>Práctica 1: Variables</td>
+                      <td>2025-03-10</td>
+                      <td><span class="estado estado-evaluado">Evaluado</span></td>
+                      <td class="calificacion">8.5</td>
+                      <td>Buen trabajo, pero faltó documentar algunas funciones.</td>
+                    </tr>
+                    <tr>
+                      <td>104</td>
+                      <td>Ana Martínez</td>
+                      <td>Práctica 2: Condicionales</td>
+                      <td>2025-03-12</td>
+                      <td><span class="estado estado-evaluado">Evaluado</span></td>
+                      <td class="calificacion">9.0</td>
+                      <td>Excelente implementación de los condicionales anidados.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Grupo 2 -->
+        <div class="grupo-card" data-grupo="B-03">
+          <div class="grupo-header" onclick="toggleGrupo(this)">
+            <h2><i class="fas fa-users"></i> Grupo B-03: Estructuras de Datos <span class="badge">8 evaluaciones</span></h2>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="grupo-content">
+            <div class="grupo-tabs">
+              <div class="grupo-tab active" onclick="cambiarTab(this, 'pendientes-B-03')">
+                <i class="fas fa-clock"></i> Pendientes <span class="count">3</span>
+              </div>
+              <div class="grupo-tab" onclick="cambiarTab(this, 'evaluados-B-03')">
+                <i class="fas fa-check-circle"></i> Evaluados <span class="count">5</span>
+              </div>
+            </div>
+            
+            <!-- Contenido de la pestaña Pendientes -->
+            <div class="tab-content active" id="pendientes-B-03">
+              <div class="table-responsive">
+                <table class="evaluacion-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Estudiante</th>
+                      <th>Práctica</th>
+                      <th>Fecha</th>
+                      <th>Estado</th>
+                      <th>Comentario</th>
+                      <th>Calificación</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>201</td>
+                      <td>Roberto Sánchez</td>
+                      <td>Práctica 3: Listas Enlazadas</td>
+                      <td>2025-03-18</td>
+                      <td><span class="estado estado-pendiente">Pendiente</span></td>
+                      <td></td>
+                      <td class="calificacion"></td>
+                      <td>
+                        <form class="evaluacion-form" action="{{ url_for('evaluacion') }}" method="POST">
+                          <input type="hidden" name="evaluacion_id" value="201" />
+                          <textarea name="comentario" placeholder="Agregar comentario"></textarea>
+                          <input type="number" name="calificacion" placeholder="Calificación" min="0" max="10" />
+                          <div class="form-actions">
+                            <button type="submit" class="btn-evaluacion"><i class="fas fa-save"></i> Guardar</button>
+                            <button type="button" class="btn-evaluacion btn-auto" onclick="evaluarEntregaAutomatica('201')"><i class="fas fa-robot"></i> Auto</button>
+                          </div>
+                        </form>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>202</td>
+                      <td>Laura Rodríguez</td>
+                      <td>Práctica 4: Árboles Binarios</td>
+                      <td>2025-03-19</td>
+                      <td><span class="estado estado-pendiente">Pendiente</span></td>
+                      <td></td>
+                      <td class="calificacion"></td>
+                      <td>
+                        <form class="evaluacion-form" action="{{ url_for('evaluacion') }}" method="POST">
+                          <input type="  action="{{ url_for('evaluacion') }}" method="POST">
+                          <input type="hidden" name="evaluacion_id" value="202" />
+                          <textarea name="comentario" placeholder="Agregar comentario"></textarea>
+                          <input type="number" name="calificacion" placeholder="Calificación" min="0" max="10" />
+                          <div class="form-actions">
+                            <button type="submit" class="btn-evaluacion"><i class="fas fa-save"></i> Guardar</button>
+                            <button type="button" class="btn-evaluacion btn-auto" onclick="evaluarEntregaAutomatica('202')"><i class="fas fa-robot"></i> Auto</button>
+                          </div>
+                        </form>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- Contenido de la pestaña Evaluados -->
+            <div class="tab-content" id="evaluados-B-03">
+              <div class="table-responsive">
+                <table class="evaluacion-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Estudiante</th>
+                      <th>Práctica</th>
+                      <th>Fecha</th>
+                      <th>Estado</th>
+                      <th>Calificación</th>
+                      <th>Comentario</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>203</td>
+                      <td>Miguel Hernández</td>
+                      <td>Práctica 3: Listas Enlazadas</td>
+                      <td>2025-03-14</td>
+                      <td><span class="estado estado-evaluado">Evaluado</span></td>
+                      <td class="calificacion">7.5</td>
+                      <td>Implementación correcta pero con algunos errores en el manejo de memoria.</td>
+                    </tr>
+                    <tr>
+                      <td>204</td>
+                      <td>Sofía Flores</td>
+                      <td>Práctica 4: Árboles Binarios</td>
+                      <td>2025-03-15</td>
+                      <td><span class="estado estado-evaluado">Evaluado</span></td>
+                      <td class="calificacion">10.0</td>
+                      <td>Trabajo excepcional, implementación eficiente y bien documentada.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Grupo 3 -->
+        <div class="grupo-card" data-grupo="A-02">
+          <div class="grupo-header" onclick="toggleGrupo(this)">
+            <h2><i class="fas fa-users"></i> Grupo A-02: Algoritmos <span class="badge">10 evaluaciones</span></h2>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="grupo-content">
+            <div class="grupo-tabs">
+              <div class="grupo-tab active" onclick="cambiarTab(this, 'pendientes-A-02')">
+                <i class="fas fa-clock"></i> Pendientes <span class="count">4</span>
+              </div>
+              <div class="grupo-tab" onclick="cambiarTab(this, 'evaluados-A-02')">
+                <i class="fas fa-check-circle"></i> Evaluados <span class="count">6</span>
+              </div>
+            </div>
+            
+            <!-- Contenido de la pestaña Pendientes -->
+            <div class="tab-content active" id="pendientes-A-02">
+              <div class="table-responsive">
+                <table class="evaluacion-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Estudiante</th>
+                      <th>Práctica</th>
+                      <th>Fecha</th>
+                      <th>Estado</th>
+                      <th>Comentario</th>
+                      <th>Calificación</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>301</td>
+                      <td>Daniel Torres</td>
+                      <td>Práctica 5: Ordenamiento</td>
+                      <td>2025-03-20</td>
+                      <td><span class="estado estado-pendiente">Pendiente</span></td>
+                      <td></td>
+                      <td class="calificacion"></td>
+                      <td>
+                        <form class="evaluacion-form" action="{{ url_for('evaluacion') }}" method="POST">
+                          <input type="hidden" name="evaluacion_id" value="301" />
+                          <textarea name="comentario" placeholder="Agregar comentario"></textarea>
+                          <input type="number" name="calificacion" placeholder="Calificación" min="0" max="10" />
+                          <div class="form-actions">
+                            <button type="submit" class="btn-evaluacion"><i class="fas fa-save"></i> Guardar</button>
+                            <button type="button" class="btn-evaluacion btn-auto" onclick="evaluarEntregaAutomatica('301')"><i class="fas fa-robot"></i> Auto</button>
+                          </div>
+                        </form>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <!-- Contenido de la pestaña Evaluados -->
+            <div class="tab-content" id="evaluados-A-02">
+              <div class="table-responsive">
+                <table class="evaluacion-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Estudiante</th>
+                      <th>Práctica</th>
+                      <th>Fecha</th>
+                      <th>Estado</th>
+                      <th>Calificación</th>
+                      <th>Comentario</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>302</td>
+                      <td>Patricia Ramírez</td>
+                      <td>Práctica 5: Ordenamiento</td>
+                      <td>2025-03-17</td>
+                      <td><span class="estado estado-evaluado">Evaluado</span></td>
+                      <td class="calificacion">9.5</td>
+                      <td>Excelente implementación de algoritmos de ordenamiento.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const burgerMenu = document.querySelector('.burger-menu');
+        const menu = document.querySelector('.menu');
+        
+        if (burgerMenu) {
+          burgerMenu.addEventListener('click', function() {
+            menu.classList.toggle('active');
+          });
+        }
+        
+        // Inicializar el primer grupo como abierto
+        const primerGrupo = document.querySelector('.grupo-header');
+        if (primerGrupo) {
+          toggleGrupo(primerGrupo);
+        }
+        
+        // Inicializar filtros
+        initFiltros();
+        
+        // Inicializar búsqueda
+        initBusqueda();
+      });
+
+      // Función para expandir/colapsar grupos
+      function toggleGrupo(header) {
+        header.classList.toggle('active');
+        const content = header.nextElementSibling;
+        
+        if (header.classList.contains('active')) {
+          content.classList.add('active');
+        } else {
+          content.classList.remove('active');
+        }
+      }
+      
+      // Función para cambiar entre pestañas
+      function cambiarTab(tab, tabId) {
+        // Desactivar todas las pestañas en el mismo grupo
+        const tabs = tab.parentElement.querySelectorAll('.grupo-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        
+        // Activar la pestaña seleccionada
+        tab.classList.add('active');
+        
+        // Ocultar todos los contenidos de pestañas
+        const contents = tab.closest('.grupo-content').querySelectorAll('.tab-content');
+        contents.forEach(c => c.classList.remove('active'));
+        
+        // Mostrar el contenido seleccionado
+        document.getElementById(tabId).classList.add('active');
+      }
+      
+      // Inicializar filtros
+      function initFiltros() {
+        const filtros = document.querySelectorAll('.filtro-btn');
+        
+        filtros.forEach(filtro => {
+          filtro.addEventListener('click', function() {
+            // Desactivar todos los filtros
+            filtros.forEach(f => f.classList.remove('active'));
+            
+            // Activar el filtro seleccionado
+            this.classList.add('active');
+            
+            const tipoFiltro = this.getAttribute('data-filter');
+            filtrarEvaluaciones(tipoFiltro);
+          });
+        });
+      }
+      
+      // Función para filtrar evaluaciones
+      function filtrarEvaluaciones(tipo) {
+        const grupos = document.querySelectorAll('.grupo-card');
+        
+        grupos.forEach(grupo => {
+          if (tipo === 'todos') {
+            grupo.style.display = 'block';
+          } else if (tipo === 'pendientes') {
+            const pendientes = grupo.querySelectorAll('.estado-pendiente');
+            grupo.style.display = pendientes.length > 0 ? 'block' : 'none';
+          } else if (tipo === 'evaluados') {
+            const evaluados = grupo.querySelectorAll('.estado-evaluado');
+            grupo.style.display = evaluados.length > 0 ? 'block' : 'none';
+          } else if (tipo === 'recientes') {
+            // Aquí se implementaría la lógica para mostrar las evaluaciones más recientes
+            // Por simplicidad, mostramos todos
+            grupo.style.display = 'block';
+          }
+        });
+      }
+      
+      // Inicializar búsqueda
+      function initBusqueda() {
+        const busquedaInput = document.getElementById('busquedaEvaluacion');
+        
+        busquedaInput.addEventListener('input', function() {
+          const termino = this.value.toLowerCase().trim();
+          
+          if (termino.length < 2) {
+            // Mostrar todos los grupos si el término es muy corto
+            document.querySelectorAll('.grupo-card').forEach(grupo => {
+              grupo.style.display = 'block';
+            });
+            return;
+          }
+          
+          // Buscar en todas las filas de las tablas
+          document.querySelectorAll('.grupo-card').forEach(grupo => {
+            let encontrado = false;
+            
+            // Buscar en las filas de la tabla
+            const filas = grupo.querySelectorAll('tbody tr');
+            filas.forEach(fila => {
+              const estudiante = fila.querySelector('td:nth-child(2)').textContent.toLowerCase();
+              const practica = fila.querySelector('td:nth-child(3)').textContent.toLowerCase();
+              
+              if (estudiante.includes(termino) || practica.includes(termino)) {
+                encontrado = true;
+                fila.style.display = 'table-row';
+              } else {
+                fila.style.display = 'none';
+              }
+            });
+            
+            // Mostrar u ocultar el grupo según si se encontraron coincidencias
+            grupo.style.display = encontrado ? 'block' : 'none';
+            
+            // Si se encontró, expandir el grupo
+            if (encontrado && !grupo.querySelector('.grupo-content').classList.contains('active')) {
+              toggleGrupo(grupo.querySelector('.grupo-header'));
+            }
+          });
+        });
+      }
+
+      function evaluarEntregaAutomatica(entregaId) {
+        fetch('/evaluar_entrega_automatica', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ evaluacion_id: entregaId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Calificación: ${data.calificacion}\nComentarios: ${data.comentarios}`);
+                location.reload(); // Recargar la página para ver los cambios
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al calificar la entrega.');
+        });
+      }
+    </script>
+  </body>
+</html>
+
+//version mejorara 2
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evaluación de Prácticas</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Josefin+Slab:wght@100..700&display=swap"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+      /* Estilos específicos para la página de evaluación */
+      #evaluacion {
+        padding: var(--space-xl) 0;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      #table-container {
+        background-color: var(--white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-xl);
+        animation: fadeIn 0.5s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      #evaluacion h2 {
+        color: var(--azul-unam);
+        margin-bottom: var(--space-lg);
+        position: relative;
+        display: inline-block;
+        font-size: 1.8rem;
+      }
+
+      #evaluacion h2::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 80px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--azul-unam), var(--gold-unam));
+        border-radius: 2px;
+      }
+
+      #evaluacion p {
+        color: var(--gray-600);
+        font-size: 1.1rem;
+        margin: var(--space-lg) 0;
+        padding: var(--space-md);
+        background-color: var(--gray-100);
+        border-radius: var(--radius-md);
+        text-align: center;
+      }
+
+      /* Estilos para las tablas */
+      #evaluacion table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: var(--space-xl);
+        background-color: var(--white);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+
+      #evaluacion thead {
+        background: linear-gradient(135deg, var(--azul-unam-l1), var(--azul-unam));
+        color: var(--white);
+      }
+
+      #evaluacion th {
+        padding: var(--space-md);
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      #evaluacion td {
+        padding: var(--space-md);
+        border-bottom: 1px solid var(--gray-200);
+        font-size: 0.95rem;
+        color: var(--gray-800);
+        vertical-align: middle;
+      }
+
+      #evaluacion tbody tr:last-child td {
+        border-bottom: none;
+      }
+
+      #evaluacion tbody tr:hover {
+        background-color: rgba(0, 61, 121, 0.03);
+      }
+
+      /* Estilos para los formularios dentro de las tablas */
+      #evaluacion form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+      }
+
+      #evaluacion textarea, 
+      #evaluacion input[type="number"] {
+        padding: 0.6rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-md);
+        font-size: 0.9rem;
+        transition: all var(--transition-normal);
+        width: 100%;
+      }
+
+      #evaluacion textarea {
+        min-height: 80px;
+        resize: vertical;
+      }
+
+      #evaluacion textarea:focus, 
+      #evaluacion input[type="number"]:focus {
+        outline: none;
+        border-color: var(--azul-unam);
+        box-shadow: 0 0 0 3px rgba(0, 61, 121, 0.1);
+      }
+
+      /* Estilos para los botones */
+      #evaluacion button {
+        background-color: var(--azul-unam);
+        color: var(--white);
+        border: none;
+        padding: 0.6rem 1rem;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: all var(--transition-normal);
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-xs);
+      }
+
+      #evaluacion button:hover {
+        background-color: var(--azul-unam-d1);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
+      }
+
+      /* Botón de calificación automática */
+      #evaluacion button[onclick^="evaluarEntregaAutomatica"] {
+        background-color: var(--gold-unam);
+        color: var(--black);
+      }
+
+      #evaluacion button[onclick^="evaluarEntregaAutomatica"]:hover {
+        background-color: var(--gold-unam-d1);
+      }
+
+      /* Estilos para los estados de evaluación */
+      #evaluacion td:nth-child(5) {
+        font-weight: 600;
+      }
+
+      /* Colores para los diferentes estados */
+      #evaluacion td:nth-child(5):contains("Pendiente") {
+        color: #fd7e14;
+      }
+
+      #evaluacion td:nth-child(5):contains("Evaluado") {
+        color: var(--azul-unam);
+      }
+
+      #evaluacion td:nth-child(5):contains("Rechazado") {
+        color: #dc3545;
+      }
+
+      /* Estilos para las calificaciones */
+      #evaluacion td:nth-child(7) {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--azul-unam-d1);
+      }
+
+      /* Animaciones para las filas de la tabla */
+      @keyframes rowFadeIn {
+        from { opacity: 0; transform: translateX(-10px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+
+      #evaluacion tbody tr {
+        animation: rowFadeIn 0.3s ease-in-out;
+        animation-fill-mode: both;
+      }
+
+      #evaluacion tbody tr:nth-child(1) { animation-delay: 0.05s; }
+      #evaluacion tbody tr:nth-child(2) { animation-delay: 0.1s; }
+      #evaluacion tbody tr:nth-child(3) { animation-delay: 0.15s; }
+      #evaluacion tbody tr:nth-child(4) { animation-delay: 0.2s; }
+      #evaluacion tbody tr:nth-child(5) { animation-delay: 0.25s; }
+      #evaluacion tbody tr:nth-child(6) { animation-delay: 0.3s; }
+      #evaluacion tbody tr:nth-child(7) { animation-delay: 0.35s; }
+      #evaluacion tbody tr:nth-child(8) { animation-delay: 0.4s; }
+      #evaluacion tbody tr:nth-child(9) { animation-delay: 0.45s; }
+      #evaluacion tbody tr:nth-child(10) { animation-delay: 0.5s; }
+
+      /* Responsive */
+      @media (max-width: 1024px) {
+        #evaluacion {
+          padding: var(--space-lg) var(--space-md);
+        }
+        
+        #table-container {
+          padding: var(--space-md);
+          overflow-x: auto;
+        }
+        
+        #evaluacion table {
+          min-width: 900px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        #evaluacion h2 {
+          font-size: 1.5rem;
+        }
+        
+        #evaluacion th, 
+        #evaluacion td {
+          padding: var(--space-sm);
+          font-size: 0.85rem;
+        }
+        
+        #evaluacion button {
+          padding: 0.5rem 0.8rem;
+          font-size: 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <a href="/">
+          <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM" />
+          <h1 class="alt-font">IntelliTutor UNAM</h1>
+        </a>
+      </div>
+
+      <div class="menu">
+        <div class="header-btns">
+          <a href="{{ url_for('index') }}" class="btn alt-font">Inicio</a>
+          <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
+          <a href="{{ url_for('admin_usuarios' if rol == 'administrador' else 'profesor_usuarios') }}" class="btn alt-font">Usuarios</a>
+          {% if rol == 'administrador' %}
+          <a href="{{ url_for('gestionar_solicitudes') }}" class="btn alt-font">Solicitudes</a>
+          {% endif %}
+        </div>
+        <div class="user-menu">
+          <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
+        </div>
+      </div>
+
+      <div class="burger-menu">
+        <i class="fas fa-bars"></i>
+      </div>
+    </header>
+    <main id="evaluacion">
+      <div id="table-container">
+        {% if evaluaciones %}
+        <h2 class="alt-font">Evaluaciones Pendientes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Estudiante</th>
+                    <th>Práctica</th>
+                    <th>Fecha de Evaluación</th>
+                    <th>Estado</th>
+                    <th>Comentario</th>
+                    <th>Calificación</th>
+                    <th>Acciones</th>
+                    <th>Auto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evaluacion in evaluaciones %}
+                <tr>
+                    <td>{{ evaluacion.id }}</td>
+                    <td>{{ evaluacion.estudiante }}</td>
+                    <td>{{ evaluacion.practica }}</td>
+                    <td>{{ evaluacion.fecha_evaluacion.strftime('%Y-%m-%d') if evaluacion.fecha_evaluacion else '' }}</td>
+                    <td>{{ evaluacion.estado }}</td>
+                    <td>{{ evaluacion.comentarios or '' }}</td>
+                    <td>{{ evaluacion.calificacion or '' }}</td>
+                    <td>
+                        <form action="{{ url_for('evaluacion') }}" method="POST">
+                            <input type="hidden" name="evaluacion_id" value="{{ evaluacion.id }}" />
+                            <textarea name="comentario" placeholder="Agregar comentario">{{ evaluacion.comentarios or '' }}</textarea>
+                            <input type="number" name="calificacion" placeholder="Calificación" value="{{ evaluacion.calificacion or '' }}" />
+                            <button type="submit"><i class="fas fa-save"></i> Guardar</button>
+                        </form>
+                        <!-- <form action="{{ url_for('eliminar_evaluacion', evaluacion_id=evaluacion.id) }}" method="POST">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form> -->
+                    </td>
+                    <td>
+                      <button onclick="evaluarEntregaAutomatica('{{ evaluacion.id }}')"><i class="fas fa-robot"></i> Calificar Auto</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No hay evaluaciones pendientes por calificar.</p>
+        {% endif %}
+
+        <h2 class="alt-font">Evaluaciones Calificadas</h2>
+        {% if evaluaciones_calificadas %}
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Estudiante</th>
+              <th>Práctica</th>
+              <th>Fecha de Evaluación</th>
+              <th>Calificación</th>
+              <th>Comentario</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for evaluacion in evaluaciones_calificadas %}
+            <tr>
+              <td>{{ evaluacion.id }}</td>
+              <td>{{ evaluacion.estudiante }}</td>
+              <td>{{ evaluacion.practica }}</td>
+              <td>{{ evaluacion.fecha_evaluacion.strftime('%Y-%m-%d') if evaluacion.fecha_evaluacion else '' }}</td>
+              <td>{{ evaluacion.calificacion }}</td>
+              <td>{{ evaluacion.comentarios or '' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No hay evaluaciones calificadas.</p>
+        {% endif %}
+      </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const burgerMenu = document.querySelector('.burger-menu');
+        const menu = document.querySelector('.menu');
+        
+        if (burgerMenu) {
+          burgerMenu.addEventListener('click', function() {
+            menu.classList.toggle('active');
+          });
+        }
+      });
+
+      function evaluarEntregaAutomatica(entregaId) {
+        fetch('/evaluar_entrega_automatica', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ evaluacion_id: entregaId }) // Asegúrate de que el ID se envíe correctamente
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Calificación: ${data.calificacion}\nComentarios: ${data.comentarios}`);
+                location.reload(); // Recargar la página para ver los cambios
+            } else {
+                alert(`Error: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al calificar la entrega.');
+        });
+      }
+    </script>
+  </body>
+</html>
+
+//version original: <!DOCTYPE html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Evaluación de Prácticas</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Josefin+Slab:wght@100..700&display=swap"
+      rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <a href="/">
+          <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM" />
+          <h1 class="alt-font">IntelliTutor UNAM</h1>
+        </a>
+      </div>
+
+      <div class="menu">
+        <div class="header-btns">
+          <a href="{{ url_for('index') }}" class="btn alt-font">Inicio</a>
+          <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
+          <a href="{{ url_for('admin_usuarios' if rol == 'administrador' else 'profesor_usuarios') }}" class="btn alt-font">Usuarios</a>
+          {% if rol == 'administrador' %}
+          <a href="{{ url_for('gestionar_solicitudes') }}" class="btn alt-font">Solicitudes</a>
+          {% endif %}
+        </div>
+        <div class="user-menu">
+          <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
+        </div>
+      </div>
+
+      <div class="burger-menu">
+        <i class="fas fa-bars"></i>
+      </div>
+    </header>
+    <main id="evaluacion">
+      <div id="table-container">
+        {% if evaluaciones %}
+    <h2 class="alt-font">Evaluaciones Pendientes</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Estudiante</th>
+                <th>Práctica</th>
+                <th>Fecha de Evaluación</th>
+                <th>Estado</th>
+                <th>Comentario</th>
+                <th>Calificación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for evaluacion in evaluaciones %}
+            <tr>
+                <td>{{ evaluacion.id }}</td>
+                <td>{{ evaluacion.estudiante }}</td>
+                <td>{{ evaluacion.practica }}</td>
+                <td>{{ evaluacion.fecha_evaluacion.strftime('%Y-%m-%d') if evaluacion.fecha_evaluacion else '' }}</td>
+                <td>{{ evaluacion.estado }}</td>
+                <td>{{ evaluacion.comentarios or '' }}</td>
+                <td>{{ evaluacion.calificacion or '' }}</td>
+                <td>
+                    <form action="{{ url_for('evaluacion') }}" method="POST">
+                        <input type="hidden" name="evaluacion_id" value="{{ evaluacion.id }}" />
+                        <textarea name="comentario" placeholder="Agregar comentario">{{ evaluacion.comentarios or '' }}</textarea>
+                        <input type="number" name="calificacion" placeholder="Calificación" value="{{ evaluacion.calificacion or '' }}" />
+                        <button type="submit">Guardar</button>
+                    </form>
+                    <!-- <form action="{{ url_for('eliminar_evaluacion', evaluacion_id=evaluacion.id) }}" method="POST">
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form> -->
+                </td>
+                <td>
+                  <button onclick="evaluarEntregaAutomatica('{{ evaluacion.id }}')">Calificar Automáticamente</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No hay evaluaciones registradas.</p>
+{% endif %}
+
+<h2 class="alt-font">Evaluaciones Calificadas</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Estudiante</th>
+      <th>Práctica</th>
+      <th>Fecha de Evaluación</th>
+      <th>Calificación</th>
+      <th>Comentario</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for evaluacion in evaluaciones_calificadas %}
+    <tr>
+      <td>{{ evaluacion.id }}</td>
+      <td>{{ evaluacion.estudiante }}</td>
+      <td>{{ evaluacion.practica }}</td>
+      <td>{{ evaluacion.fecha_evaluacion.strftime('%Y-%m-%d') if evaluacion.fecha_evaluacion else '' }}</td>
+      <td>{{ evaluacion.calificacion }}</td>
+      <td>{{ evaluacion.comentarios or '' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+    </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+    <script>
+      function evaluarEntregaAutomatica(entregaId) {
+    fetch('/evaluar_entrega_automatica', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ evaluacion_id: entregaId }) // Asegúrate de que el ID se envíe correctamente
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`Calificación: ${data.calificacion}\nComentarios: ${data.comentarios}`);
+            location.reload(); // Recargar la página para ver los cambios
+        } else {
+            alert(`Error: ${data.error}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Ocurrió un error al calificar la entrega.');
+    });
+}
+  </script>
+  </body>
+</html>
+
+//codigo nada que ver pero ayuda con la carga de iconos
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">

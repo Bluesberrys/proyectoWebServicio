@@ -10,8 +10,10 @@ CREATE TABLE IF NOT EXISTS usuarios (
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     rol ENUM('estudiante', 'profesor', 'admin') NOT NULL,
-    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    numero_cuenta INT(9) UNIQUE
 );
+
 -- Tabla de materias
 CREATE TABLE IF NOT EXISTS materias (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -47,7 +49,7 @@ CREATE TABLE IF NOT EXISTS conceptos (
     nombre VARCHAR(100) NOT NULL,
     descripcion TEXT,
     materia_id INT,
-    FOREIGN KEY (materia_id) REFERENCES materias(id)
+    FOREIGN KEY (materia_id) REFERENCES materias(id) ON DELETE CASCADE
 );
 
 -- Tabla de prácticas
@@ -60,15 +62,18 @@ CREATE TABLE IF NOT EXISTS practicas (
     concepto_id INT,
     herramienta_id INT,
     objetivo TEXT NOT NULL,
+    introduccion TEXT,
+    descripcion TEXT,
     fecha_entrega DATETIME NOT NULL,
     tiempo_estimado INT NOT NULL,
     estado ENUM('Pendiente','Completado','Cancelado') NOT NULL DEFAULT 'Pendiente',
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (materia_id) REFERENCES materias(id),
-    FOREIGN KEY (nivel_id) REFERENCES niveles(id),
-    FOREIGN KEY (autor_id) REFERENCES usuarios(id),
-    FOREIGN KEY (concepto_id) REFERENCES conceptos(id),
-    FOREIGN KEY (herramienta_id) REFERENCES herramientas(id)
+    uso_ia BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (materia_id) REFERENCES materias(id) ON DELETE CASCADE,
+    FOREIGN KEY (nivel_id) REFERENCES niveles(id) ON DELETE CASCADE,
+    FOREIGN KEY (autor_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (concepto_id) REFERENCES conceptos(id) ON DELETE SET NULL,
+    FOREIGN KEY (herramienta_id) REFERENCES herramientas(id) ON DELETE SET NULL
 );
 
 -- Tabla de relación práctica-competencia
@@ -77,8 +82,8 @@ CREATE TABLE IF NOT EXISTS practica_competencia (
     practica_id INT NOT NULL,
     competencia_id INT NOT NULL,
     nivel INT NOT NULL,
-    FOREIGN KEY (practica_id) REFERENCES practicas(id),
-    FOREIGN KEY (competencia_id) REFERENCES competencias(id)
+    FOREIGN KEY (practica_id) REFERENCES practicas(id) ON DELETE CASCADE,
+    FOREIGN KEY (competencia_id) REFERENCES competencias(id) ON DELETE CASCADE
 );
 
 -- Tabla de prerequisitos de práctica
@@ -87,17 +92,28 @@ CREATE TABLE IF NOT EXISTS practica_prerequisitos (
     practica_id INT NOT NULL,
     competencia_id INT NOT NULL,
     nivel_requerido INT NOT NULL,
-    FOREIGN KEY (practica_id) REFERENCES practicas(id),
-    FOREIGN KEY (competencia_id) REFERENCES competencias(id)
+    FOREIGN KEY (practica_id) REFERENCES practicas(id) ON DELETE CASCADE,
+    FOREIGN KEY (competencia_id) REFERENCES competencias(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS semestres (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE  -- Ejemplo: 'Semestre 1', 'Semestre 2', etc.
 );
 
 -- Tabla de grupos
 CREATE TABLE IF NOT EXISTS grupos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT,
-    practica_id INT,
-    FOREIGN KEY (practica_id) REFERENCES practicas(id)
+    nombre VARCHAR(100) NOT NULL,          -- Nombre del grupo (ej. A-1101)
+    descripcion TEXT,                      -- Descripción del grupo
+    materia_id INT NOT NULL,               -- ID de la materia (clave foránea)
+    semestre_id INT NOT NULL,              -- ID del semestre (clave foránea)
+    profesor_id INT NOT NULL,              -- ID del profesor (clave foránea)
+    fecha_creacion DATETIME DEFAULT NOW(), -- Fecha de creación del grupo
+    activo BOOLEAN DEFAULT TRUE,            -- Estado del grupo (activo/inactivo)
+    FOREIGN KEY (materia_id) REFERENCES materias(id) ON DELETE CASCADE,
+    FOREIGN KEY (semestre_id) REFERENCES semestres(id) ON DELETE CASCADE,
+    FOREIGN KEY (profesor_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
 -- Tabla de miembros de grupo
@@ -106,8 +122,24 @@ CREATE TABLE IF NOT EXISTS grupo_miembros (
     grupo_id INT NOT NULL,
     usuario_id INT NOT NULL,
     rol VARCHAR(50) NOT NULL,
-    FOREIGN KEY (grupo_id) REFERENCES grupos(id),
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    FOREIGN KEY (grupo_id) REFERENCES grupos(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Tabla de evaluaciones
+CREATE TABLE IF NOT EXISTS evaluaciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    practica_id INT NOT NULL,
+    estudiante_id INT NOT NULL,
+    evaluador_id INT NOT NULL,
+    fecha_evaluacion DATETIME NOT NULL,
+    estado ENUM('pendiente', 'en_proceso', 'completada', 'revisada', 'calificado') NOT NULL,
+    calificacion DECIMAL(5,2),
+    comentarios TEXT,
+    uso_ia INT DEFAULT 0,
+    FOREIGN KEY (practica_id) REFERENCES practicas(id) ON DELETE CASCADE,
+    FOREIGN KEY (estudiante_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (evaluador_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
 -- Tabla de entregas
@@ -116,11 +148,14 @@ CREATE TABLE IF NOT EXISTS entregas (
     practica_id INT NOT NULL,
     estudiante_id INT NOT NULL,
     fecha_entrega DATETIME NOT NULL,
-    estado ENUM('pendiente', 'revisada', 'retroalimentada') NOT NULL,
+    estado ENUM('pendiente', 'revisada', 'retroalimentada', 'calificado') NOT NULL,
     archivos_url TEXT,
+    contenido TEXT,
     calificacion DECIMAL(5,2),
-    FOREIGN KEY (practica_id) REFERENCES practicas(id),
-    FOREIGN KEY (estudiante_id) REFERENCES usuarios(id)
+    evaluacion_id INT,
+    FOREIGN KEY (practica_id) REFERENCES practicas(id) ON DELETE CASCADE,
+    FOREIGN KEY (estudiante_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (evaluacion_id) REFERENCES evaluaciones(id) ON DELETE SET NULL
 );
 
 -- Tabla de retroalimentación
@@ -131,8 +166,8 @@ CREATE TABLE IF NOT EXISTS retroalimentacion (
     comentario TEXT NOT NULL,
     aspecto VARCHAR(100) NOT NULL,
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (entrega_id) REFERENCES entregas(id),
-    FOREIGN KEY (profesor_id) REFERENCES usuarios(id)
+    FOREIGN KEY (entrega_id) REFERENCES entregas(id) ON DELETE CASCADE,
+    FOREIGN KEY (profesor_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
 -- Tabla de rúbricas
@@ -142,7 +177,7 @@ CREATE TABLE IF NOT EXISTS rubricas (
     criterio VARCHAR(200) NOT NULL,
     descripcion TEXT NOT NULL,
     puntaje_maximo INT NOT NULL,
-    FOREIGN KEY (practica_id) REFERENCES practicas(id)
+    FOREIGN KEY (practica_id) REFERENCES practicas(id) ON DELETE CASCADE
 );
 
 -- Tabla de niveles de rúbrica
@@ -152,7 +187,7 @@ CREATE TABLE IF NOT EXISTS rubrica_niveles (
     nivel INT NOT NULL,
     descripcion TEXT NOT NULL,
     puntaje INT NOT NULL,
-    FOREIGN KEY (rubrica_id) REFERENCES rubricas(id)
+    FOREIGN KEY (rubrica_id) REFERENCES rubricas(id) ON DELETE CASCADE
 );
 
 -- Tabla de recursos de práctica
@@ -163,7 +198,7 @@ CREATE TABLE IF NOT EXISTS recursos_practica (
     nombre VARCHAR(200) NOT NULL,
     url TEXT NOT NULL,
     descripcion TEXT,
-    FOREIGN KEY (practica_id) REFERENCES practicas(id)
+    FOREIGN KEY (practica_id) REFERENCES practicas(id) ON DELETE CASCADE
 );
 
 -- Tabla de notificaciones
@@ -174,7 +209,7 @@ CREATE TABLE IF NOT EXISTS notificaciones (
     mensaje TEXT NOT NULL,
     leida BOOLEAN DEFAULT FALSE,
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
 -- Tabla de resultados de aprendizaje
@@ -185,110 +220,48 @@ CREATE TABLE IF NOT EXISTS resultados_aprendizaje (
     nivel_logrado INT NOT NULL,
     evidencias TEXT NOT NULL,
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (practica_id) REFERENCES practicas(id),
-    FOREIGN KEY (competencia_id) REFERENCES competencias(id)
+    FOREIGN KEY (practica_id) REFERENCES practicas(id) ON DELETE CASCADE,
+    FOREIGN KEY (competencia_id) REFERENCES competencias(id) ON DELETE CASCADE
 );
 
--- Tabla de evaluaciones
-CREATE TABLE IF NOT EXISTS evaluaciones (
+-- Crear la tabla contenido_generado
+CREATE TABLE IF NOT EXISTS contenido_generado (
     id INT AUTO_INCREMENT PRIMARY KEY,
     practica_id INT NOT NULL,
-    estudiante_id INT NOT NULL,
-    evaluador_id INT NOT NULL,
-    fecha_evaluacion DATETIME NOT NULL,
-    estado ENUM('pendiente', 'en_proceso', 'completada', 'revisada') NOT NULL,
-    calificacion DECIMAL(5,2),
-    comentarios TEXT,
-    FOREIGN KEY (practica_id) REFERENCES practicas(id),
-    FOREIGN KEY (estudiante_id) REFERENCES usuarios(id),
-    FOREIGN KEY (evaluador_id) REFERENCES usuarios(id)
+    contenido JSON NOT NULL,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (practica_id) REFERENCES practicas(id) ON DELETE CASCADE
+);
+
+-- Crear la tabla versiones
+CREATE TABLE IF NOT EXISTS versiones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    practica_id INT NOT NULL,
+    contenido JSON NOT NULL,
+    autor_id INT NOT NULL,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    numero_version INT NOT NULL,
+    cambios TEXT,
+    FOREIGN KEY (practica_id) REFERENCES practicas(id) ON DELETE CASCADE,
+    FOREIGN KEY (autor_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
 
+-- Crear la tabla tiempo_registrado
+CREATE TABLE IF NOT EXISTS tiempo_registrado (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    tiempo FLOAT NOT NULL,
+    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
 
--- Insertar usuarios de ejemplo
-INSERT INTO usuarios (nombre, email, password_hash, rol) VALUES
-('Juan Pérez', 'juan@universidad.edu', 'hash123', 'profesor'),
-('María García', 'maria@universidad.edu', 'hash456', 'estudiante'),
-('Admin Sistema', 'admin@universidad.edu', 'hash789', 'admin'),
-('Urban', 'udullaghan0@webeden.co.uk', 'zO4@V<fg\vrqZNq', 'estudiante'),
-('Melantha', 'mpetrelli1@icq.com', 'hJ9={pfZq*>U9ir', 'estudiante'),
-('Felicity', 'fmerrilees2@unicef.org', 'iV8=,ykM2O_I#z', 'estudiante'),
-('Barbee', 'belfes3@wunderground.com', 'wZ8,fkGk', 'profesor'),
-('Trstram', 'tdeavall4@irs.gov', 'qG3*q~{Qz=S7', 'profesor'),
-('Calley', 'cherrema5@hubpages.com', 'xK6`CG#PW', 'estudiante'),
-('Nani', 'nzeale6@epa.gov', 'dW6=Q2kZ0Xka', 'estudiante'),
-('Launce', 'lkitchenman7@hugedomains.com', 'aB9_Zw5y!f"A)pV', 'estudiante'),
-('Lebbie', 'lsolley8@oracle.com', 'iA7>%Sn&u?', 'profesor'),
-('Tara', 'thalpeine9@theglobeandmail.com', 'hZ6)Q''Qi?bE*4Tp', 'profesor');
-
-
--- Insertar materias
-INSERT INTO materias (nombre, descripcion) VALUES
-('Base de datos', 'Fundamentos y aplicaciones de bases de datos'),
-('Programación', 'Programación y desarrollo de software'),
-('Machine Learning', 'Aprendizaje automático y análisis de datos'),
-('Seguridad Informática', 'Seguridad de sistemas y redes');
-
--- Insertar niveles
-INSERT INTO niveles (nombre, descripcion) VALUES
-('Básico', 'Nivel fundamental de conocimientos'),
-('Intermedio', 'Nivel medio de conocimientos'),
-('Avanzado', 'Nivel experto de conocimientos');
-
--- Insertar competencias
-INSERT INTO competencias (nombre, descripcion) VALUES
-('Diseño de BD', 'Capacidad para diseñar bases de datos eficientes'),
-('Optimización', 'Habilidad para optimizar consultas y estructuras'),
-('Programación SQL', 'Dominio de SQL y procedimientos almacenados'),
-('Seguridad', 'Implementación de medidas de seguridad en BD');
-
--- Insertar herramientas
-INSERT INTO herramientas (nombre, descripcion, tipo) VALUES
-('MySQL', 'Sistema de gestión de bases de datos relacionales', 'DBMS'),
-('PostgreSQL', 'Sistema de BD relacional avanzado', 'DBMS'),
-('MongoDB', 'Base de datos NoSQL', 'NoSQL'),
-('DBeaver', 'Cliente universal de bases de datos', 'Cliente');
-
--- Completar conceptos para todas las materias
--- Base de datos (continuación)
-INSERT INTO conceptos (materia_id, nombre, descripcion) VALUES
-(1, 'Bases de datos NoSQL', 'Sistemas de bases de datos no relacionales'),
-(1, 'Seguridad en BD', 'Implementación de medidas de seguridad'),
--- Programación
-(2, 'Estructuras de datos', 'Organización y manipulación de datos'),
-(2, 'Algoritmos', 'Diseño y análisis de algoritmos'),
-(2, 'POO', 'Programación Orientada a Objetos'),
-(2, 'Patrones de diseño', 'Soluciones comunes a problemas de diseño'),
--- Machine Learning
-(3, 'Regresión', 'Modelos de regresión y predicción'),
-(3, 'Clasificación', 'Algoritmos de clasificación'),
-(3, 'Clustering', 'Agrupamiento de datos'),
-(3, 'Redes neuronales', 'Deep learning y redes neuronales'),
--- Seguridad Informática
-(4, 'Criptografía', 'Técnicas de cifrado y seguridad'),
-(4, 'Seguridad en redes', 'Protección de redes y comunicaciones'),
-(4, 'Ethical Hacking', 'Pruebas de penetración'),
-(4, 'Forense digital', 'Análisis forense de sistemas');
-
--- Insertar una práctica de ejemplo
-INSERT INTO practicas (titulo, materia_id, nivel_id, autor_id, concepto_id, herramienta_id, objetivo, fecha_entrega, tiempo_estimado, estado) VALUES
-('Diseño de Base de Datos E-commerce', 1, 2, 1, 1, 1, 'Diseñar una base de datos normalizada para un sistema de comercio electrónico', 
- DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 14 DAY), 10, 'Pendiente');
-
--- Insertar un grupo de ejemplo
-INSERT INTO grupos (nombre, descripcion, practica_id) VALUES
-('Grupo 1', 'Grupo de práctica de bases de datos', 1);
-
-
--- Insertar una rúbrica de ejemplo
-INSERT INTO rubricas (practica_id, criterio, descripcion, puntaje_maximo) VALUES
-(1, 'Normalización', 'Nivel de normalización de la base de datos', 20),
-(1, 'Diagrama ER', 'Calidad del diagrama entidad-relación', 20),
-(1, 'Implementación', 'Correcta implementación en SQL', 30),
-(1, 'Documentación', 'Calidad de la documentación', 30);
-
--- Insertar recursos de ejemplo
-INSERT INTO recursos_practica (practica_id, tipo, nombre, url, descripcion) VALUES
-(1, 'documento', 'Guía de normalización', 'https://ejemplo.com/guia', 'Guía detallada del proceso de normalización'),
-(1, 'video', 'Tutorial MySQL', 'https://ejemplo.com/video', 'Video tutorial de implementación en MySQL');
+CREATE TABLE solicitudes_registro (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    rol_solicitado ENUM('administrador', 'profesor', 'estudiante') NOT NULL,
+    estado ENUM('pendiente', 'aprobada', 'rechazada') DEFAULT 'pendiente',
+    fecha_solicitud DATETIME DEFAULT CURRENT_TIMESTAMP
+);

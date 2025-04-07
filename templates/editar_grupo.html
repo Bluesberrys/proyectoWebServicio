@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Grupo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+        main form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 500px;
+    margin: 0 auto; 
+}
+
+main form div {
+    display: flex;
+    flex-direction: column;
+}
+
+main form input, main form textarea, main form select {
+    padding: 0.5rem;
+    border: 1px solid var(--azul-unam-l1);
+    border-radius: var(--radius-md);
+}
+
+main form button {
+    background-color: var(--azul-unam);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color var(--transition-normal);
+}
+
+main form button:hover {
+    background-color: var(--azul-unam-l1);
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        
+    </header>
+
+    <main>
+        <h2>Editar Grupo: {{ grupo.nombre }}</h2>
+        <form action="{{ url_for('editar_grupo', grupo_id=grupo.id) }}" method="POST">
+            <div>
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" value="{{ grupo.nombre }}" required>
+            </div>
+            <div>
+                <label for="descripcion">Descripción:</label>
+                <textarea id="descripcion" name="descripcion" required>{{ grupo.descripcion }}</textarea>
+            </div>
+            <div>
+                <label for="turno">Turno:</label>
+                <select id="turno" name="turno" required>
+                    <option value="matutino" {% if grupo.turno == 'matutino' %}selected{% endif %}>Matutino</option>
+                    <option value="verpertino" {% if grupo.turno == 'verpertino' %}selected{% endif %}>Verpertino</option>
+                </select>
+            </div>
+            <div>
+                <label for="semestre_id">Semestre:</label>
+                <select id="semestre_id" name="semestre_id" required>
+                </select>
+            </div>
+            <button type="submit">Actualizar Grupo</button>
+        </form>
+    </main>
+</body>
+</html>

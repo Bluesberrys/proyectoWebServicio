@@ -1,94 +1,1134 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Evaluación de Prácticas</title>
-    <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Josefin+Slab:wght@100..700&display=swap"
-      rel="stylesheet" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-  </head>
-  <body>
-    <header>
-      <div class="logo">
-        <a href="/">
-          <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM" />
-          <h1 class="alt-font">IntelliTutor UNAM</h1>
-        </a>
-      </div>
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluación de Prácticas</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Josefin+Slab:wght@100..700&display=swap"
+    rel="stylesheet" />
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <style>
+    :root {
+      --card-transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      --card-hover-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      --card-border-radius: 16px;
+      --header-gradient: linear-gradient(135deg, var(--azul-unam), #002855);
+      --gold-gradient: linear-gradient(135deg, var(--gold-unam), #c49c3c);
+      --glass-bg: rgba(255, 255, 255, 0.9);
+      --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      --blur-effect: blur(10px);
+    }
+  
+    body {
+      background-color: #f5f7fa;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 61, 121, 0.03) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(196, 156, 60, 0.03) 0%, transparent 20%),
+        linear-gradient(135deg, rgba(0, 61, 121, 0.02) 0%, rgba(196, 156, 60, 0.02) 100%);
+      background-attachment: fixed;
+      background-size: cover;
+    }
+  
+    #evaluacion {
+      padding: var(--space-xl) var(--space-md);
+      max-width: 1400px;
+      margin: 0 auto;
+      position: relative;
+      min-height: 80vh;
+    }
+  
+    @keyframes cardAppear {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  
+    .card-wrapper {
+      animation: cardAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      animation-fill-mode: both;
+      position: absolute;
+    }
+  
+    .evaluacion-header {
+      text-align: center;
+      margin-bottom: var(--space-xxl);
+      padding: var(--space-xl) var(--space-lg);
+      background: var(--glass-bg);
+      backdrop-filter: var(--blur-effect);
+      -webkit-backdrop-filter: var(--blur-effect);
+      border-radius: var(--card-border-radius);
+      border: var(--glass-border);
+      position: relative;
+      overflow: hidden;
+    }
+  
+    .evaluacion-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: var(--header-gradient);
+    }
+  
+    .evaluacion-header h1 {
+      font-size: 3rem;
+      color: var(--azul-unam);
+      margin-bottom: var(--space-md);
+      font-weight: 800;
+      position: relative;
+      display: inline-block;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  
+    .evaluacion-header h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: var(--gold-gradient);
+      border-radius: 2px;
+    }
+  
+    .evaluacion-header p {
+      color: var(--gray-600);
+      max-width: 700px;
+      margin: 0 auto;
+      font-size: 1.2rem;
+      line-height: 1.6;
+    }
+  
+    .controles-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+      align-items: center;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border-radius: var(--card-border-radius);
+    border: var(--glass-border);
+    padding: var(--space-lg);
+    position: relative;
+    z-index: 10;
+  }
 
-      <div class="menu">
-        <div class="header-btns">
-          <a href="{{ url_for('index') }}" class="btn alt-font">Inicio</a>
-          <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
-          <a href="{{ url_for('evaluacion') }}" class="btn alt-font">Evaluación</a>
-        </div>
-        <div class="user-menu">
-          <a href="" id="regis" class="btn alt-font">Registrarse</a>
-          <a href="" id="login" class="btn alt-font">Iniciar sesión</a>
-        </div>
-      </div>
+  .busqueda-container {
+    flex: 1;
+    position: relative;
+    min-width: 250px;
+  }
 
-      <div class="burger-menu">
-        <i class="fas fa-bars"></i>
+  .busqueda-input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: 1px solid rgba(0, 61, 121, 0.2);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .busqueda-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--azul-unam);
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+  }
+
+  .busqueda-input:focus {
+    outline: none;
+    border-color: var(--azul-unam);
+    box-shadow: 0 0 0 4px rgba(0, 61, 121, 0.1);
+    background-color: white;
+  }
+
+  .busqueda-input:focus + .busqueda-icon {
+    color: var(--azul-unam);
+    transform: translateY(-50%) scale(1.2);
+  }
+
+  .selector-grupo {
+    padding: 1rem 1.5rem;
+    border: 1px solid rgba(0, 61, 121, 0.2);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    min-width: 220px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23003D79' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+  }
+
+  .selector-grupo:focus {
+    outline: none;
+    border-color: var(--azul-unam);
+    box-shadow: 0 0 0 4px rgba(0, 61, 121, 0.1);
+    background-color: white;
+  }
+
+  .filtro-estado {
+    display: flex;
+    gap: var(--space-xs);
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: var(--radius-lg);
+    padding: 0.3rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .filtro-btn {
+    background: none;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: var(--radius-lg);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--gray-600);
+  }
+
+  .filtro-btn:hover {
+    color: var(--azul-unam);
+    transform: translateY(-2px);
+  }
+
+  .filtro-btn.active {
+    background-color: var(--azul-unam);
+    color: var(--white);
+    box-shadow: 0 4px 8px rgba(0, 61, 121, 0.2);
+  }
+
+  .materia-section {
+    margin-bottom: var(--space-xxl);
+    animation: fadeIn 0.8s ease-out;
+    position: relative;
+    display: block;
+  }
+
+  .materia-header {
+    font-size: 2rem;
+    width: 100%;
+    text-align: center;
+    color: var(--white);
+    margin-bottom: var(--space-xl);
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    padding: var(--space-md) var(--space-lg);
+    background: var(--header-gradient);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .materia-header i {
+    margin-right: var(--space-sm);
+    color: var(--gold-unam);
+  }
+
+ 
+  .evaluaciones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: var(--space-xl);
+    margin-top: var(--space-xl);
+    perspective: 1000px;
+  }
+
+  .card-container {
+    height: 450px;
+    margin-bottom: var(--space-lg);
+    perspective: 1000px;
+  }
+
+  .evaluacion-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--card-shadow);
+    cursor: default; 
+  }
+
+  .evaluacion-card.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: var(--card-border-radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-front {
+    background-color: white;
+  }
+
+  .card-back {
+    transform: rotateY(180deg);
+    background-color: white;
+    z-index: 1000;
+  }
+
+  .evaluacion-card-header {
+    padding: var(--space-md);
+    background: var(--header-gradient);
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .evaluacion-card-back-header {
+    padding: var(--space-md);
+    background: var(--gold-gradient);
+    color: var(--black);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .evaluacion-card-header::before, .evaluacion-card-back-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+      opacity: 0.3;
+      z-index: -1;
+    }
+
+  .evaluacion-card-body {
+    padding: var(--space-md);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    position: relative;
+    background-color: var(--white);
+    z-index: 2;
+    overflow-y: auto;
+  }
+
+  .evaluacion-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    position: relative;
+  }
+
+  .evaluacion-info-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.9rem;
+    color: var(--gray-700);
+    padding: var(--space-xs) 0;
+    border-bottom: 1px solid rgba(0, 61, 121, 0.05);
+  }
+
+  .evaluacion-info-item:last-child {
+    border-bottom: none;
+  }
+
+  .evaluacion-info-item i {
+    color: var(--azul-unam);
+    width: 20px;
+    text-align: center;
+  }
+
+  .evaluacion-info-item strong {
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-right: var(--space-xs);
+  }
+
+  .archivo-link {
+    color: var(--azul-unam);
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    transition: all 0.3s ease;
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+    background-color: rgba(0, 61, 121, 0.1);
+    z-index: 20; 
+  }
+
+  .archivo-link:hover {
+    background-color: var(--azul-unam);
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 61, 121, 0.2);
+  }
+
+  .estado {
+    font-weight: 700;
+    padding: 0.4rem 0.8rem;
+    border-radius: 30px;
+    display: inline-block;
+    font-size: 0.75rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    align-self: flex-start;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .estado-pendiente {
+    background: var(--gold-unam);
+    color: var(--white);
+  }
+
+  .estado-entregado {
+    background: var(--azul-unam);
+    color: var(--white);
+  }
+
+  .estado-evaluado, .estado-evaluado {
+    background: linear-gradient(135deg, var(--azul-unam), #002855);
+    color: var(--white);
+  }
+
+  .estado-rechazado {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: var(--white);
+  }
+
+  .comentarios {
+    background-color: rgba(0, 61, 121, 0.05);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    margin-top: var(--space-sm);
+    position: relative;
+  }
+
+  .comentarios p {
+    margin: var(--space-xs) 0;
+    color: var(--gray-700);
+    font-size: 0.9rem;
+  }
+
+  .comentarios p strong {
+    color: var(--azul-unam);
+  }
+
+  .card-actions {
+    margin-top: auto;
+    display: flex;
+    gap: var(--space-md);
+  }
+
+  .btn-flip {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 100;
+  }
+
+    .btn-flip-back {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+  }
+
+  .btn-flip:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.1);
+  }
+
+  .btn-flip-back:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+
+  .btn-evaluacion {
+    background: var(--header-gradient);
+    color: var(--white);
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    box-shadow: 0 4px 8px rgba(0, 61, 121, 0.2);
+  }
+
+  .btn-evaluacion:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 61, 121, 0.3);
+  }
+
+  .btn-ia {
+    background: var(--gold-gradient);
+    color: var(--black);
+    box-shadow: 0 4px 8px rgba(196, 156, 60, 0.2);
+  }
+
+  .btn-ia:hover {
+    box-shadow: 0 6px 12px rgba(196, 156, 60, 0.3);
+  }
+
+  .calificacion-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-sm);
+  }
+
+  .calificacion-form label {
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: 0.9rem;
+  }
+
+  .calificacion-form textarea {
+    min-height: 120px;
+    padding: 0.7rem;
+    border: 1px solid #ddd;
+    border-radius: var(--radius-md);
+    resize: vertical;
+    font-size: 0.9rem;
+  }
+
+  .calificacion-form input[type="number"] {
+    width: 80px;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+  }
+
+  .calificacion-form button {
+    margin-top: var(--space-sm);
+    background: var(--header-gradient);
+    color: white;
+    border: none;
+    padding: 0.7rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+  }
+
+  .calificacion-form button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .materia-section p {
+    padding: var(--space-xl);
+    text-align: center;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border-radius: var(--card-border-radius);
+    color: var(--gray-600);
+    font-size: 1.1rem;
+    border: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    margin-top: var(--space-md);
+  }
+
+  .materia-section p i {
+    font-size: 1.5rem;
+    color: var(--gold-unam);
+    margin-right: var(--space-sm);
+  }
+
+  .no-evaluaciones {
+    padding: var(--space-xxl);
+    text-align: center;
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border-radius: var(--card-border-radius);
+    color: var(--gray-600);
+    font-size: 1.2rem;
+    border: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    margin: var(--space-xl) 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .no-evaluaciones::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: var(--gold-gradient);
+  }
+
+  .no-evaluaciones i {
+    font-size: 4rem;
+    color: var(--gold-unam);
+    margin-bottom: var(--space-md);
+    display: block;
+    animation: floatIcon 3s ease-in-out infinite;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .evaluaciones-grid .card-container:nth-child(1) { animation-delay: 0.1s; }
+  .evaluaciones-grid .card-container:nth-child(2) { animation-delay: 0.2s; }
+  .evaluaciones-grid .card-container:nth-child(3) { animation-delay: 0.3s; }
+  .evaluaciones-grid .card-container:nth-child(4) { animation-delay: 0.4s; }
+  .evaluaciones-grid .card-container:nth-child(5) { animation-delay: 0.5s; }
+  .evaluaciones-grid .card-container:nth-child(6) { animation-delay: 0.6s; }
+
+  @media (max-width: 1200px) {
+    .evaluaciones-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .evaluacion-header h1 {
+      font-size: 2.5rem;
+    }
+    
+    .materia-header {
+      font-size: 1.8rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .evaluacion-header h1 {
+      font-size: 2rem;
+    }
+    
+    .evaluacion-header p {
+      font-size: 1rem;
+    }
+    
+    .controles-container {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .filtro-estado {
+      width: 100%;
+      justify-content: center;
+      overflow-x: auto;
+      padding: 0.3rem;
+    }
+    
+    .filtro-btn {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    
+    .evaluaciones-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #evaluacion {
+      padding: var(--space-md) var(--space-sm);
+    }
+    
+    .evaluacion-header h1 {
+      font-size: 1.5rem;
+    }
+    
+    .materia-header {
+      font-size: 1.5rem;
+      padding: var(--space-sm) var(--space-md);
+    }
+    
+    .evaluacion-info-item {
+      gap: var(--space-sm);
+    }
+    
+    .btn-evaluacion {
+      padding: 0.7rem 1rem;
+      font-size: 0.9rem;
+    }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <a href="/">
+        <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM" />
+        <h1 class="alt-font">IntelliTutor UNAM</h1>
+      </a>
+    </div>
+
+    <div class="menu">
+      <div class="header-btns">
+        <a href="{{ url_for('index') }}" class="btn alt-font">Inicio</a>
+        <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
+        <a href="{{ url_for('admin_usuarios' if rol == 'administrador' else 'profesor_usuarios') }}" class="btn alt-font">Usuarios</a>
+        {% if rol == 'administrador' %}
+        <a href="{{ url_for('gestionar_solicitudes') }}" class="btn alt-font">Solicitudes</a>
+        {% endif %}
       </div>
-    </header>
-    <main id="evaluacion">
-      <div id="table-container">
-        <h2 class="alt-font">Evaluaciones</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Estudiante</th>
-              <th>Práctica</th>
-              <th>Fecha de Evaluación</th>
-              <th>Estado</th>
-              <th>Comentario</th>
-              <th>Calificación</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for evaluacion in evaluaciones %}
-            <tr>
-              <td>{{ evaluacion.id }}</td>
-              <td>{{ evaluacion.estudiante }}</td>
-              <td>{{ evaluacion.practica }}</td>
-              <td>
-                {{ evaluacion.fecha_evaluacion.strftime('%Y-%m-%d') if evaluacion.fecha_evaluacion else '' }}
-              </td>
-              <td>{{ evaluacion.estado }}</td>
-              <td>{{ evaluacion.comentarios }}</td>
-              <td>{{ evaluacion.calificacion }}</td>
-              <td>
-                <form action="{{ url_for('evaluacion') }}" method="POST">
-                  <input type="hidden" name="evaluacion_id" value="{{ evaluacion.id }}" />
-                  <textarea name="comentario" placeholder="Agregar comentario">
-{{ evaluacion.comentarios }}</textarea
-                  >
-                  <input
-                    type="number"
-                    name="calificacion"
-                    placeholder="Calificación"
-                    value="{{ evaluacion.calificacion }}" />
-                  <button type="submit">Guardar</button>
-                </form>
-                <a href="{{ url_for('eliminar_evaluacion', evaluacion_id=evaluacion.id) }}">Eliminar</a>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <div class="user-menu">
+        <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
       </div>
-    </main>
-    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
-  </body>
+    </div>
+
+    <div class="burger-menu">
+      <i class="fas fa-bars"></i>
+    </div>
+  </header>
+
+  <main id="evaluacion">
+    <div class="evaluacion-header">
+      <h1 class="alt-font">Evaluación de Prácticas</h1>
+      <p>Gestiona y evalúa las prácticas de tus estudiantes organizadas por materias.</p>
+    </div>
+
+    <div class="controles-container">
+      <div class="busqueda-container">
+        <input type="text" class="busqueda-input" id="busquedaEvaluacion" placeholder="Buscar por nombre de estudiante o práctica...">
+        <i class="fas fa-search busqueda-icon"></i>
+      </div>
+      
+      <select class="selector-grupo" id="selectorGrupo">
+        <option value="todos">Todas las materias</option>
+        {% for materia in materias %}
+          <option value="{{ materia.id }}" {% if loop.first %}selected{% endif %}>{{ materia.nombre }}</option>
+        {% endfor %}
+      </select>
+      
+      <div class="filtro-estado">
+        <button class="filtro-btn active" data-filter="todos">Todos</button>
+        <button class="filtro-btn" data-filter="pendiente">Pendientes</button>
+        <button class="filtro-btn" data-filter="entregado">Por evaluar</button>
+        <button class="filtro-btn" data-filter="calificado">calificados</button>
+      </div>
+    </div>
+
+    <div class="grupos-container">
+      {% if materias %}
+        {% for materia in materias %}
+          <div class="materia-section" data-materia="{{ materia.id }}">
+            <h2 class="materia-header"><i class="fas fa-book"></i> {{ materia.nombre }}</h2>
+            {% if materia.id in practicas_por_materia %}
+              <div class="evaluaciones-grid">
+                {% for practica in practicas_por_materia[materia.id] %}
+                  {% for estudiante in practica.estudiantes %}
+                    <div class="card-container">
+                      <div class="evaluacion-card" data-estado="{% if estudiante.calificacion %}calificado{% else %}{{ estudiante.estado }}{% endif %}" id="card-{{ estudiante.estudiante_id }}">
+                        <div class="card-front">
+                          <div class="evaluacion-card-header">
+                            <h3>
+                              {% if estudiante.estado == 'pendiente' %}
+                                Esperando Entrega
+                              {% elif estudiante.estado == 'entregado' and estudiante.archivo_url %}
+                                <a href="{{ url_for('static', filename='uploads/' + estudiante.archivo_url) }}" target="_blank">{{ estudiante.archivo_url }}</a>
+                              {% elif estudiante.estado == 'calificado' and estudiante.archivo_url %}
+                                Calificado: {{ estudiante.archivo_url }}
+                              {% else %}
+                                Sin archivo disponible
+                              {% endif %}
+                            </h3>
+                            {% if estudiante.estado == 'entregado' and estudiante.archivo_url %}
+                              <a href="{{ url_for('static', filename='uploads/' + estudiante.archivo_url) }}" target="_blank" class="archivo-link-header">Ver archivo</a>
+                            {% endif %}
+                          </div>
+                          <div class="evaluacion-card-body">
+                            <div class="evaluacion-info">
+                              <div class="evaluacion-info-item">
+                                <i class="fas fa-user"></i>
+                                <span><strong>Estudiante:</strong> {{ estudiante.estudiante_nombre }}</span>
+                              </div>
+                              <div class="evaluacion-info-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span><strong>Fecha de Entrega:</strong> {{ practica.fecha_entrega.strftime('%Y-%m-%d') }}</span>
+                              </div>
+                              <span class="estado estado-{{ estudiante.estado }}">{{ estudiante.estado }}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div class="card-back">
+                          <div class="evaluacion-card-back-header">
+                            <h3>Detalles de Evaluación</h3>
+                            <button class="btn-flip btn-flip-back" onclick="flipCardBack(event, '{{ estudiante.estudiante_id }}')">
+                              <i class="fas fa-undo"></i>
+                            </button>
+                          </div>
+                          <div class="evaluacion-card-body">
+                            <div class="evaluacion-info">
+                              <div class="evaluacion-info-item">
+                                <i class="fas fa-user"></i>
+                                <span><strong>Estudiante:</strong> {{ estudiante.estudiante_nombre }}</span>
+                              </div>
+                              {% if estudiante.archivo_url %}
+                              <div class="evaluacion-info-item">
+                                <i class="fas fa-file"></i>
+                                <span>
+                                  <a href="{{ url_for('static', filename='uploads/' + estudiante.archivo_url) }}" target="_blank" class="archivo-link">
+                                    Ver documento
+                                  </a>
+                                </span>
+                              </div>
+                              {% endif %}
+                            </div>
+    
+                            {% if estudiante.calificacion %}
+                              <div class="comentarios">
+                                <p><strong>Calificación:</strong> {{ estudiante.calificacion }}</p>
+                                {% if estudiante.comentarios %}
+                                  <p><strong>Comentarios:</strong> {{ estudiante.comentarios }}</p>
+                                {% endif %}
+                              </div>
+                            {% elif estudiante.estado == 'entregado' %}
+                              {% if estudiante.uso_ia == 0 %}
+                                <form class="calificacion-form" action="{{ url_for('guardar_calificacion') }}" method="POST">
+                                  <input type="hidden" name="evaluacion_id" value="{{ estudiante.evaluacion_id }}">
+                                  
+                                  <div>
+                                    <label for="calificacion-back-{{ estudiante.evaluacion_id }}">Calificación (1-10):</label>
+                                    <input type="number" id="calificacion-back-{{ estudiante.evaluacion_id }}" name="calificacion" min="1" max="10" required>
+                                  </div>
+                                  
+                                  <div>
+                                    <label for="comentarios-back-{{ estudiante.evaluacion_id }}">Comentarios:</label>
+                                    <textarea id="comentarios-back-{{ estudiante.evaluacion_id }}" name="comentarios" required></textarea>
+                                  </div>
+                                  
+                                  <button type="submit" class="btn-evaluacion">
+                                    <i class="fas fa-save"></i> Guardar calificación
+                                  </button>
+                                </form>
+                              {% else %}
+                                <div class="comentarios">
+                                  <p>Esta entrega aún no ha sido evaluada.</p>
+                                </div>
+                              {% endif %}
+                            {% else %}
+                              <div class="comentarios">
+                                <p>Esta entrega aún no ha sido evaluada.</p>
+                              </div>
+                            {% endif %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% endfor %}
+              </div>
+            {% else %}
+              <p>No hay prácticas asociadas a esta materia.</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-evaluaciones">
+          <i class="fas fa-clipboard-check"></i>
+          <p>No hay materias disponibles.</p>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const burgerMenu = document.querySelector('.burger-menu');
+      const menu = document.querySelector('.menu');
+      
+      if (burgerMenu) {
+        burgerMenu.addEventListener('click', function() {
+          menu.classList.toggle('active');
+        });
+      }
+      
+      document.querySelectorAll('.materia-section').forEach(section => {
+        section.style.display = 'block';
+      });
+      
+      initFiltros();
+      
+      initBusqueda();
+      
+      initSelectorGrupo();
+      
+      organizarActividades();
+      
+      preventLinkFlip();
+    });
+    
+    // Prevenir que los enlaces activen el volteo de tarjetas
+    function preventLinkFlip() {
+      document.querySelectorAll('.archivo-link, .archivo-link-header').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.stopPropagation();
+        });
+      });
+    }
+    
+    function flipCard(event, id) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  const card = document.getElementById(`card-${id}`);
+  if (card && !card.classList.contains('flipped')) {
+    card.classList.add('flipping');
+    requestAnimationFrame(() => {
+      card.classList.add('flipped');
+      card.classList.remove('flipping');
+    });
+  }
+}
+
+function flipCardBack(event, id) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  const card = document.getElementById(`card-${id}`);
+  if (card && card.classList.contains('flipped')) {
+    card.classList.add('flipping');
+    requestAnimationFrame(() => {
+      card.classList.remove('flipped');
+      card.classList.remove('flipping');
+    });
+  }
+}
+
+
+    
+    function initFiltros() {
+      const filtros = document.querySelectorAll('.filtro-btn');
+      
+      filtros.forEach(filtro => {
+        filtro.addEventListener('click', function() {
+          filtros.forEach(f => f.classList.remove('active'));
+          
+          this.classList.add('active');
+          
+          const tipoFiltro = this.getAttribute('data-filter');
+          filtrarPorEstado(tipoFiltro);
+        });
+      });
+      
+      filtrarPorEstado('todos');
+    }
+    
+    function filtrarPorEstado(estado) {
+  document.querySelectorAll('.materia-section').forEach(seccion => {
+    seccion.style.display = 'block';
+  });
+  
+  document.querySelectorAll('.evaluacion-card').forEach(card => {
+    const cardContainer = card.closest('.card-container');
+    if (estado === 'todos' || card.getAttribute('data-estado') === estado) {
+      cardContainer.style.display = 'block';
+    } else {
+      cardContainer.style.display = 'none';
+    }
+  });
+  document.querySelectorAll('.materia-section').forEach(seccion => {
+    const tarjetasVisibles = Array.from(seccion.querySelectorAll('.card-container')).filter(card => 
+      window.getComputedStyle(card).display !== 'none'
+    ).length;
+    
+    if (tarjetasVisibles === 0) {
+      seccion.style.display = 'none';
+    } else {
+      seccion.style.display = 'block';
+    }
+  });
+}
+    
+    function initBusqueda() {
+      const busquedaInput = document.getElementById('busquedaEvaluacion');
+      
+      busquedaInput.addEventListener('input', function() {
+        const termino = this.value.toLowerCase().trim();
+        
+        document.querySelectorAll('.materia-section').forEach(seccion => {
+          seccion.style.display = 'block';
+        });
+        
+        document.querySelectorAll('.evaluacion-card').forEach(card => {
+          const cardContainer = card.closest('.card-container');
+          const contenidoCard = card.textContent.toLowerCase();
+          
+          if (termino.length === 0 || contenidoCard.includes(termino)) {
+            cardContainer.style.display = 'block';
+          } else {
+            cardContainer.style.display = 'none';
+          }
+        });
+        
+        document.querySelectorAll('.materia-section').forEach(seccion => {
+          const tarjetasVisibles = Array.from(seccion.querySelectorAll('.card-container')).filter(card => 
+            window.getComputedStyle(card).display !== 'none'
+          ).length;
+          
+          if (tarjetasVisibles === 0) {
+            seccion.style.display = 'none';
+          } else {
+            seccion.style.display = 'block';
+          }
+        });
+      });
+    }
+    
+    function initSelectorGrupo() {
+      const selectorGrupo = document.getElementById('selectorGrupo');
+
+      selectorGrupo.addEventListener('change', function () {
+        const materiaSeleccionada = this.value;
+
+        document.querySelectorAll('.materia-section').forEach((materia) => {
+          if (materiaSeleccionada === 'todos' || materia.getAttribute('data-materia') === materiaSeleccionada) {
+            materia.style.display = 'block';
+          } else {
+            materia.style.display = 'none';
+          }
+        });
+        
+        if (materiaSeleccionada === 'todos') {
+          document.querySelectorAll('.card-container').forEach(card => {
+            card.style.display = 'block';
+          });
+        }
+      });
+    }
+    
+    function organizarActividades() {
+      document.querySelectorAll('.evaluaciones-grid').forEach(grid => {
+        const cards = Array.from(grid.querySelectorAll('.card-container'));
+        
+        cards.sort((a, b) => {
+          const estadoA = a.querySelector('.evaluacion-card').getAttribute('data-estado');
+          const estadoB = b.querySelector('.evaluacion-card').getAttribute('data-estado');
+          
+          const orden = { 'calificado': 1, 'entregado': 2, 'pendiente': 3 };
+          return orden[estadoA] - orden[estadoB];
+        });
+        
+        cards.forEach(card => {
+          grid.appendChild(card);
+        });
+      });
+    }
+
+    function evaluarEntregaAutomatica(entregaId) {
+      fetch('/evaluar_entrega_automatica', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ evaluacion_id: entregaId })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              alert(`Calificación: ${data.calificacion}\nComentarios: ${data.comentarios}`);
+              location.reload(); 
+          } else {
+              alert(`Error: ${data.error}`);
+          }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          alert('Ocurrió un error al calificar la entrega.');
+      });
+    }
+document.addEventListener('DOMContentLoaded', () => {
+  const cards = document.querySelectorAll('.evaluacion-card');
+
+  cards.forEach((card) => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('button') || e.target.closest('a')) return;
+
+      card.classList.toggle('flipped');
+    });
+  });
+});
+
+  </script>
+</body>
 </html>

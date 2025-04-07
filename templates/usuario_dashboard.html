@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Estudiante Dashboard - IntelliTutor UNAM</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Josefin+Slab:wght@100..700&display=swap"
+      rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/71a7ab61a9.js" crossorigin="anonymous"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+
+  <body>
+    <header>
+      <div class="logo">
+        <a href="/">
+          <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM" />
+          <h1 class="alt-font">IntelliTutor UNAM</h1>
+        </a>
+      </div>
+
+      <div class="menu">
+        <div class="header-btns">
+          <a href="{{ url_for('usuario_dashboard') }}" class="btn alt-font">Inicio</a>
+          <a href="{{ url_for('vista_estudiante', estudiante_id=estudiante_id) }}" class="btn alt-font">Prácticas</a>
+          <a href="{{ url_for('estudiante_evaluacion', estudiante_id=estudiante_id) }}" class="btn alt-font">Evaluaciones</a>
+        </div>
+        <div class="user-menu">
+          <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
+        </div>
+      </div>
+
+      <div class="burger-menu">
+        <i class="fas fa-bars"></i>
+      </div>
+    </header>
+
+    <main id="estudiante-dashboard">
+      <div class="hero">
+        <div class="info_inicio">
+          <h1 class="alt-font">Bienvenido Estudiante</h1>
+          <p>
+            Explora tus prácticas, evaluaciones y recursos educativos en IntelliTutor UNAM.
+          </p>
+        </div>
+      </div>
+
+      <div id="container-cards">
+        <h1 class="title-cards alt-font">Secciones</h1>
+
+        <div class="card">
+          <img src="{{ url_for('static', filename='img/practicas.jpeg') }}" alt="Imagen 1" />
+          <h1>Prácticas</h1>
+          <p>Accede y realiza tus prácticas.</p>
+          <a class="btn" href="{{ url_for('vista_estudiante', estudiante_id=estudiante_id) }}">Ir a Prácticas</a>
+        </div>
+
+        <div class="card">
+          <img src="{{ url_for('static', filename='img/evaluacion.webp') }}" alt="Imagen 2" />
+          <h1>Evaluaciones Calificadas</h1>
+          <p>Consulta los resultados de tus evaluaciones calificadas.</p>
+          <a class="btn" href="{{ url_for('estudiante_evaluacion', estudiante_id=estudiante_id) }}">Ir a Evaluaciones</a>
+        </div>
+
+        <div class="card">
+          <img src="{{ url_for('static', filename='img/ayuda.jpg') }}" alt="Imagen 3" />
+          <h1>Ayuda</h1>
+          <p>Información adicional sobre IntelliTutor UNAM.</p>
+          <a class="btn" href="#container-cards">Más información</a>
+        </div>
+      </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Usuario Dashboard - IntelliTutor UNAM</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Josefin+Slab:wght@100..700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://kit.fontawesome.com/71a7ab61a9.js" crossorigin="anonymous"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="/">
+                <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM" />
+                <h1 class="alt-font">IntelliTutor UNAM</h1>
+            </a>
+        </div>
+
+        <nav class="menu">
+            <div class="header-btns">
+                <a href="{{ url_for('profesor_dashboard') }}" class="btn alt-font">Inicio</a>
+                <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
+                <a href="{{ url_for('profesor_usuarios') }}" class="btn alt-font">Usuarios</a>
+                <a href="{{ url_for('evaluacion') }}" class="btn alt-font">Evaluación</a>
+            </div>
+            <div class="user-menu">
+                <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
+            </div>
+        </nav>
+
+        <div class="burger-menu" id="burgerMenu">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main id="usuario-dashboard">
+        <div class="hero">
+            <div class="info_inicio">
+                <h1 class="alt-font">Bienvenido, Profesor</h1>
+                <p>Accede a tus prácticas, evaluaciones y más en IntelliTutor UNAM.</p>
+            </div>
+        </div>
+
+        <div id="container-cards">
+            <h1 class="title-cards alt-font">Secciones</h1>
+
+            <div class="card">
+                <img src="{{ url_for('static', filename='img/practicas.jpeg') }}" alt="Imagen 1" />
+                <h1>Gestión de prácticas</h1>
+                <p>Generación y modificación de prácticas.</p>
+                <a class="btn" href="{{ url_for('practicas') }}">Prácticas</a>
+            </div>
+
+            <div class="card">
+                <img src="{{ url_for('static', filename='img/evaluacion.webp') }}" alt="Imagen 2" />
+                <h1>Evaluación de prácticas</h1>
+                <p>Resultado de evaluación de las prácticas entregadas por el estudiante.</p>
+                <a class="btn" href="{{ url_for('evaluacion') }}">Evaluación</a>
+            </div>
+
+            <div class="card">
+                <img src="{{ url_for('static', filename='img/aulas.jpg') }}" alt="Imagen 6" />
+                <h1>Aulas Virtuales</h1>
+                <p>Información sobre las aulas y sus prácticas.</p>
+                <a class="btn" href="{{ url_for('aulas') }}">Aulas</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 IntelliTutor UNAM - Todos los derechos reservados</p>
+        <div class="footer-links">
+            <a href="#">Política de Privacidad</a>
+            <a href="#">Términos y Condiciones</a>
+        </div>
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // Burger Menu Functionality
+        document.getElementById('burgerMenu').addEventListener('click', () => {
+            document.querySelector('.menu').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

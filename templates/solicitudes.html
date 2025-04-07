@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <title>Gestión de Solicitudes</title>
+</head>
+<body>
+    <header>
+        <div class="logo">
+          <a href="/">
+            <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM" />
+            <h1 class="alt-font">IntelliTutor UNAM</h1>
+          </a>
+        </div>
+      
+        <div class="menu">
+          <div class="header-btns">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn alt-font">Inicio</a>
+          <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
+          <a href="{{ url_for('admin_usuarios') }}" class="btn alt-font">Usuarios</a>
+          </div>
+          <div class="user-menu">
+            <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
+          </div>
+        </div>
+      
+        <div class="burger-menu">
+          <i class="fas fa-bars"></i>
+        </div>
+      </header>
+      
+      <main class="solicitudes-main">
+        <div class="solicitudes-container">
+          <h1>Solicitudes de Registro</h1>
+          <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol Solicitado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="solicitudes-table">
+              {% for solicitud in solicitudes %}
+              <tr>
+                  <td>{{ solicitud.id }}</td>
+                  <td>{{ solicitud.nombre }}</td>
+                  <td>{{ solicitud.email }}</td>
+                  <td>{{ solicitud.rol_solicitado }}</td>
+                  <td>
+                      <button onclick="gestionarSolicitud('{{ solicitud.id }}', 'aprobar')">Aprobar</button>
+                      <button onclick="gestionarSolicitud('{{ solicitud.id }}', 'rechazar')">Rechazar</button>
+                  </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+        </div>
+      </main>
+
+    <script>
+        function gestionarSolicitud(id, accion) {
+    fetch('/gestionar_solicitudes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, accion })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        location.reload();
+    });
+}
+    </script>
+    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+</body>
+</html>

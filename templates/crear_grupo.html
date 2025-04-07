@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Grupo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="/">
+                <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM">
+                <h1 class="alt-font">IntelliTutor UNAM</h1>
+            </a>
+        </div>
+        <nav class="menu">
+            <div class="header-btns">
+                <a href="{{ url_for('profesor_dashboard') }}" class="btn alt-font">Inicio</a>
+                <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
+                <a href="{{ url_for('profesor_usuarios') }}" class="btn alt-font">Usuarios</a>
+                <a href="{{ url_for('evaluacion') }}" class="btn alt-font">Evaluación</a>
+            </div>
+            <div class="user-menu">
+                <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Crear Grupo</h2>
+        <form action="{{ url_for('crear_grupo') }}" method="POST">
+            <div class="form-group">
+                <label for="materia_id">Materia:</label>
+                <select id="materia_id" name="materia_id" class="form-input" required>
+                    {% for materia in materias %}
+                    <option value="{{ materia.id }}">{{ materia.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="semestre_id">Semestre:</label>
+                <select id="semestre_id" name="semestre_id" class="form-input" required>
+                    {% for semestre in semestres %}
+                    <option value="{{ semestre.id }}">{{ semestre.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="turno">Turno:</label>
+                <select id="turno" name="turno" class="form-input" required>
+                    <option value="matutino">Matutino</option>
+                    <option value="verpertino">Verpertino</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="grupo_id">Grupo:</label>
+                <select id="grupo_id" name="grupo_numero" class="form-input" required>
+                    <option value="">Seleccione un grupo</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="descripcion">Descripción:</label>
+                <textarea id="descripcion" name="descripcion" class="form-input" required></textarea>
+            </div>
+            <button type="submit" id="form-btn" class="alt-font">Crear Grupo</button>
+        </form>
+    </main>
+    <script>
+        document.getElementById('semestre_id').addEventListener('change', function() {
+    const semestreId = this.value;
+    const grupoSelect = document.getElementById('grupo_id');
+    grupoSelect.innerHTML = ''; 
+
+    const turno = document.getElementById('turno').value === 'matutino' ? 'A' : 'B';
+    const grupos = [];
+
+    if (semestreId) {
+        for (let i = 1; i <= 3; i++) { 
+            const grupoNumero = `0${i}`.slice(-2); 
+            const grupo = `${grupoNumero}`;
+            grupos.push(grupo);
+        }
+
+        grupos.forEach(grupo => {
+            const option = document.createElement('option');
+            option.value = grupo;  
+            option.textContent = grupo;
+            grupoSelect.appendChild(option);
+        });
+    }
+});
+
+document.getElementById('turno').addEventListener('change', function() {
+    document.getElementById('semestre_id').dispatchEvent(new Event('change'));
+});
+
+    </script>
+</body>
+</html>

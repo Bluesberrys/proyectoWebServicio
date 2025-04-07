@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Estudiantes</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="/">
+                <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM">
+                <h1 class="alt-font">IntelliTutor UNAM</h1>
+            </a>
+        </div>
+        <nav class="menu">
+            <div class="header-btns">
+                <a href="{{ url_for('profesor_dashboard') }}" class="btn alt-font">Inicio</a>
+                <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
+                <a href="{{ url_for('profesor_usuarios') }}" class="btn alt-font">Usuarios</a>
+                <a href="{{ url_for('evaluacion') }}" class="btn alt-font">Evaluación</a>
+            </div>
+            <div class="user-menu">
+                <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="grupo-data" data-grupo-id="{{ grupo.id }}">
+        <h2>Gestionar Estudiantes en el Grupo: {{ grupo.nombre }}</h2>
+
+        <h3>Estudiantes Inscritos:</h3>
+        <table id="estudiantes-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for estudiante in estudiantes %}
+                <tr id="estudiante-{{ estudiante.id }}">
+                    <td>{{ estudiante.nombre }}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="eliminarEstudiante('{{ estudiante.id }}')">Eliminar</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>Agregar Estudiante:</h3>
+        <form id="agregar-estudiante-form">
+            <div class="form-group">
+                <label for="usuario_id">Selecciona un estudiante:</label>
+                <select name="usuario_id" id="usuario_id" required>
+                    <option value="">Selecciona un estudiante</option>
+                    {% for estudiante in todos_estudiantes %}
+                    <option value="{{ estudiante.id }}">{{ estudiante.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn">Agregar Alumno</button>
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 IntelliTutor UNAM - Todos los derechos reservados</p>
+        <div class="footer-links">
+            <a href="#">Política de Privacidad</a>
+            <a href="#">Términos y Condiciones</a>
+            <a href="#">Contacto</a>
+            <a href="#">Ayuda</a>
+        </div>
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('agregar-estudiante-form').addEventListener('submit', function(event) {
+                event.preventDefault(); 
+                const usuarioId = document.getElementById('usuario_id').value;
+                const grupoId = document.getElementById('grupo-data').dataset.grupoId;
+
+                fetch(`/gestionar_estudiantes/${grupoId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        usuario_id: usuarioId,
+                        accion: 'agregar' 
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        const nuevoEstudiante = document.createElement('tr');
+                        nuevoEstudiante.id = `estudiante-${usuarioId}`;
+                        nuevoEstudiante.innerHTML = `
+                            <td>${document.querySelector(`#usuario_id option[value='${usuarioId}']`).text}</td>
+                            <td>
+                                <button class="btn btn-danger" onclick="eliminarEstudiante(${usuarioId})">Eliminar</button>
+                            </td>
+                        `;
+                        document.querySelector('#estudiantes-table tbody').appendChild(nuevoEstudiante);
+                        alert("Estudiante agregado exitosamente");
+                    } else {
+                        alert("Error al agregar el estudiante");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Error al agregar el estudiante");
+                });
+            });
+
+            window.eliminarEstudiante = function(usuarioId) {
+                const grupoId = document.getElementById('grupo-data').dataset.grupoId;
+
+                fetch(`/gestionar_estudiantes/${grupoId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        usuario_id: usuarioId,
+                        accion: 'eliminar'
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        document.getElementById(`estudiante-${usuarioId}`).remove();
+                        alert("Estudiante eliminado exitosamente");
+                    } else {
+                        alert("Error al eliminar el estudiante");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Error al eliminar el estudiante");
+                });
+            };
+        });
+    </script>
+</body>
+</html>

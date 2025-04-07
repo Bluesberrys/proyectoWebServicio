@@ -4,8 +4,8 @@ import mysql.connector
 try:
     conn = mysql.connector.connect(
         host="localhost",
-        user="root",  # Cambia por tu usuario real
-        password="",  # Cambia por tu contraseña real
+        user="root",  
+        password="",  
         database="generador_practicas"
     )
     print("Conexión exitosa a la BD")

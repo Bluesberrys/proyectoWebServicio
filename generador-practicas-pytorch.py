@@ -50,7 +50,6 @@ class SimpleTokenizer:
                               key=lambda x: x[1], reverse=True)
         self.word_counts = word_counts
 
-        # Reservar índice 0 para padding
         self.word_index = {"<PAD>": 0}
         self.index_word = {0: "<PAD>"}
 
@@ -132,7 +131,6 @@ class PracticaGenerator(nn.Module):
 
 class GeneradorPracticasML:
     def __init__(self, model_path: str = 'modelo_practicas_pytorch.pt'):
-        # Directorio del modelo
         self.model_dir = os.path.dirname(os.path.abspath(__file__))
         self.model_path = os.path.join(self.model_dir, model_path)
         self.tokenizer_path = os.path.join(
@@ -142,7 +140,6 @@ class GeneradorPracticasML:
         self.device = torch.device(
             'cuda' if torch.cuda.is_available() else 'cpu')
 
-        # Cargar modelo si existe, si no, crear uno nuevo
         if os.path.exists(self.model_path) and os.path.exists(self.tokenizer_path):
             try:
                 self.model = PracticaGenerator(vocab_size=self.vocab_size)
@@ -165,37 +162,28 @@ class GeneradorPracticasML:
 
     def _crear_modelo(self):
         """Crea un modelo simple de red neuronal para generación de texto"""
-        # Definir tokenizer simple
         self.tokenizer = SimpleTokenizer(num_words=self.vocab_size)
 
-        # Modelo base con arquitectura LSTM para procesamiento de texto
         self.model = PracticaGenerator(vocab_size=self.vocab_size)
         self.model.to(self.device)
 
-        # Guardar modelo vacío
         self.guardar_modelo()
 
     def entrenar_modelo(self, titulos: List[str], objetivos: List[str], contenidos: List[str], epochs: int = 50):
         """Entrena el modelo con datos existentes de prácticas"""
-        # Combinar títulos y objetivos como entradas
         entradas = [f"{titulo} | {objetivo}" for titulo,
                     objetivo in zip(titulos, objetivos)]
 
-        # Tokenizar entradas y salidas
         self.tokenizer.fit_on_texts(entradas + contenidos)
 
-        # Crear dataset y dataloader
         dataset = TextDataset(entradas, contenidos, self.tokenizer)
         dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
 
-        # Configurar optimizador y función de pérdida
         optimizer = optim.Adam(self.model.parameters())
         criterion = nn.CrossEntropyLoss()
 
-        # Modo entrenamiento
         self.model.train()
 
-        # Entrenar modelo
         for epoch in range(epochs):
             total_loss = 0
             for batch_idx, (inputs, targets) in enumerate(dataloader):
@@ -213,20 +201,16 @@ class GeneradorPracticasML:
             print(
                 f'Epoch {epoch+1}/{epochs}, Loss: {total_loss/len(dataloader):.4f}')
 
-        # Guardar modelo entrenado
         self.guardar_modelo()
 
     def generar_practica(self, titulo: str, objetivo: str) -> Dict[str, Any]:
         """Genera contenido de práctica basado en título y objetivo"""
-        # Combinar título y objetivo
         entrada = f"{titulo} | {objetivo}"
 
-        # Tokenizar y convertir a secuencia
         seq = torch.tensor(self.tokenizer.encode(
             entrada, max_length=self.max_length)).unsqueeze(0)
         seq = seq.to(self.device)
 
-        # Generar predicción
         self.model.eval()
         with torch.no_grad():
             pred = self.model(seq).cpu().numpy()[0]
@@ -317,6 +301,50 @@ class GeneradorPracticasDB:
             self.generador_ml = GeneradorPracticasML()
             self.connection = None
             self.cursor = None
+
+    def generar_comentarios_y_calificacion(self, titulo: str, contenido: str) -> Dict[str, Any]:
+        """Genera calificación y comentarios para una entrega."""
+        entrada = f"{titulo} | {contenido}"
+        seq = torch.tensor(self.tokenizer.encode(entrada, max_length=self.max_length)).unsqueeze(0)
+        seq = seq.to(self.device)
+
+        self.model.eval()
+        with torch.no_grad():
+            pred = self.model(seq).cpu().numpy()[0]
+
+        # Calcular calificación como promedio ponderado
+        calificacion = np.dot(pred, np.arange(len(pred))) / len(pred)
+
+        # Generar comentarios basados en las palabras más probables
+        indices = np.argsort(pred)[-5:]  # Top 5 palabras más probables
+        comentarios = " ".join([self.tokenizer.index_word[idx] for idx in reversed(indices) if idx in self.tokenizer.index_word])
+
+        return {
+            "calificacion": round(calificacion, 2),
+            "comentarios": comentarios
+        }
+
+    def generar_comentarios_y_calificacion(self, titulo: str, contenido: str) -> Dict[str, Any]:
+        """Genera calificación y comentarios para una entrega."""
+        entrada = f"{titulo} | {contenido}"
+        seq = torch.tensor(self.tokenizer.encode(entrada, max_length=self.max_length)).unsqueeze(0)
+        seq = seq.to(self.device)
+
+        self.model.eval()
+        with torch.no_grad():
+            pred = self.model(seq).cpu().numpy()[0]
+
+        # Calcular calificación como promedio ponderado
+        calificacion = np.dot(pred, np.arange(len(pred))) / len(pred)
+
+        # Generar comentarios basados en las palabras más probables
+        indices = np.argsort(pred)[-5:]  # Top 5 palabras más probables
+        comentarios = " ".join([self.tokenizer.index_word[idx] for idx in reversed(indices) if idx in self.tokenizer.index_word])
+
+        return {
+            "calificacion": round(calificacion, 2),
+            "comentarios": comentarios
+        }
 
     def login_usuario(self, email: str, password: str) -> Optional[Dict]:
         """Autenticar usuario"""

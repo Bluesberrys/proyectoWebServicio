@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Alumnos a Grupo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="/">
+                <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM">
+                <h1 class="alt-font">IntelliTutor UNAM</h1>
+            </a>
+        </div>
+        <nav class="menu">
+            <div class="header-btns">
+                <a href="{{ url_for('profesor_dashboard') }}" class="btn alt-font">Inicio</a>
+                <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
+                <a href="{{ url_for('profesor_usuarios') }}" class="btn alt-font">Usuarios</a>
+                <a href="{{ url_for('evaluacion') }}" class="btn alt-font">Evaluación</a>
+            </div>
+            <div class="user-menu">
+                <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Agregar Alumnos a Grupo</h2>
+        <form action="{{ url_for('agregar_alumno_a_grupo') }}" method="POST">
+            <div class="form-group">
+                <label for="grupo_id">Grupo:</label>
+                <select id="grupo_id" name="grupo_id" class="form-input" required>
+                    {% if grupos %}
+                        {% for grupo in grupos %}
+                            <option value="{{ grupo.id }}">{{ grupo.nombre }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="">No hay grupos disponibles</option>
+                    {% endif %}
+                </select>
+                
+            </div>
+            <div class="form-group">
+                <label for="usuario_id">Estudiante:</label>
+                <select id="usuario_id" name="usuario_id" class="form-input" required>
+                    {% for estudiante in estudiantes %}
+                    <option value="{{ estudiante.id }}">{{ estudiante.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" id="form-btn" class="alt-font">Agregar Alumno</button>
+        </form>
+    </main>
+</body>
+</html>

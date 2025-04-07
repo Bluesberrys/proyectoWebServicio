@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aulas Virtuales - IntelliTutor UNAM</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Josefin+Slab:wght@100..700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://kit.fontawesome.com/71a7ab61a9.js" crossorigin="anonymous"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <style>
+        .aulas-container {
+            padding: var(--space-xl) 0;
+        }
+
+        .aulas-header {
+            text-align: center;
+            margin-bottom: var(--space-xxl);
+        }
+
+        .aulas-header h1 {
+            font-size: 2.5rem;
+            color: var(--azul-unam);
+            margin-bottom: var(--space-xl);
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+
+        .aulas-header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--azul-unam), var(--gold-unam));
+            border-radius: 2px;
+        }
+
+        .aulas-header p {
+            color: var(--gray-600);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .aulas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: var(--space-xl);
+            margin-top: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            perspective: 1000px;
+        }
+
+        .aula-card-container, .create-class-card-container {
+            height: 500px; 
+            perspective: 1000px;
+            margin-bottom: var(--space-md);
+            opacity: 0;
+            transform: translateY(100px) scale(0.8);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .aula-card-container.show, .create-class-card-container.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .aula-card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .aula-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        
+        .aula-card-front, .aula-card-back, .create-class-front, .create-class-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--white);
+        }
+
+        .aula-card-front {
+            border-top: 3px solid var(--azul-unam);
+        }
+
+        .aula-card-back {
+            transform: rotateY(180deg);
+            border-top: 3px solid var(--gold-unam);
+        }
+
+        
+        .aula-card-header {
+            padding: var(--space-lg);
+            background: linear-gradient(135deg, var(--azul-unam-l1), var(--azul-unam));
+            color: var(--white);
+            position: relative;
+        }
+
+        .aula-card-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: var(--space-sm);
+            font-weight: 600;
+        }
+
+        .aula-card-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .aula-card-icon {
+            position: absolute;
+            top: var(--space-lg);
+            right: var(--space-lg);
+            font-size: 2rem;
+            opacity: 0.2;
+        }
+
+        
+        .aula-card-body {
+            padding: var(--space-lg);
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden; 
+            position: relative;
+        }
+
+        
+        .aula-card-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23003D79' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.7;
+            z-index: 0;
+        }
+
+       
+
+        .aula-progress {
+            position: relative;
+            height: 8px;
+            background-color: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: var(--space-md) 0;
+            z-index: 1;
+        }
+
+        .aula-progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, var(--azul-unam), var(--gold-unam));
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .aula-card-footer {
+            padding: var(--space-md) var(--space-lg);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--gray-100);
+            flex-shrink: 0; 
+            width: 100%;
+        }
+
+        .aula-stats {
+            display: flex;
+            gap: var(--space-md);
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        .aula-stats div {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .aula-stats i {
+            color: var(--azul-unam);
+        }
+
+        .aula-card-actions {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .aula-card-actions button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--azul-unam);
+            color: var(--white);
+            transition: all var(--transition-normal);
+            border: none;
+            cursor: pointer;
+        }
+
+        .aula-card-actions button:hover {
+            background-color: var(--azul-unam-l2);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .aula-card-actions button.edit {
+            background-color: var(--gold-unam);
+            color: var(--black);
+        }
+
+        .aula-card-actions button.edit:hover {
+            background-color: var(--gold-unam-l1);
+        }
+
+        
+        .create-class-card-container {
+            height: 500px; 
+            perspective: 1000px;
+            margin-bottom: var(--space-md);
+            opacity: 0;
+            transform: translateY(50px) rotate(-5deg);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .create-class-card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .create-class-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .create-class-front, 
+        .create-class-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--white);
+        }
+
+        .create-class-front {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f4f8;
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            cursor: pointer;
+            text-align: center;
+            border: 2px dashed var(--azul-unam-l1);
+        }
+
+        .create-class-front:hover {
+            background-color: #e0e7ff;
+            border-color: var(--azul-unam);
+        }
+
+        .create-class-front i {
+            font-size: 3rem;
+            color: var(--azul-unam);
+            margin-bottom: var(--space-md);
+            transition: transform var(--transition-normal);
+        }
+
+        .create-class-front:hover i {
+            transform: rotate(90deg);
+        }
+
+        .create-class-front h2 {
+            font-size: 1.5rem;
+            color: var(--azul-unam-d1);
+            margin: 0;
+        }
+
+        .create-class-back {
+            transform: rotateY(180deg);
+            border-top: 3px solid var(--gold-unam);
+            padding: var(--space-lg);
+            overflow-y: auto;
+        }
+
+        .create-class-back h2 {
+            font-size: 1.5rem;
+            color: var(--azul-unam);
+            margin-bottom: var(--space-lg);
+            text-align: center;
+            position: relative;
+        }
+
+        .create-class-back h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--azul-unam), var(--gold-unam));
+            border-radius: 2px;
+        }
+
+        
+        .back-header {
+            padding: var(--space-lg);
+            background: linear-gradient(135deg, var(--gold-unam-d1), var(--gold-unam));
+            color: var(--black);
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .back-content {
+            padding: var(--space-lg);
+            flex: 1 1 auto;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .back-footer {
+            padding: var(--space-md) var(--space-lg);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            background-color: var(--gray-100);
+        }
+
+        .back-btn {
+            background-color: var(--azul-unam);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .back-btn:hover {
+            background-color: var(--azul-unam-d1);
+            transform: translateY(-2px);
+        }
+
+        
+        .edit-form, .create-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-normal);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--azul-unam);
+            box-shadow: 0 0 0 3px rgba(0, 61, 121, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background-color: var(--gold-unam);
+            color: var(--black);
+            border: none;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            margin-top: var(--space-sm);
+        }
+
+        .submit-btn:hover {
+            background-color: var(--gold-unam-d1);
+            transform: translateY(-2px);
+        }
+
+        .details-section {
+            margin-bottom: var(--space-lg);
+        }
+
+        .details-section h3 {
+            font-size: 1.1rem;
+            color: var(--azul-unam);
+            margin-bottom: var(--space-sm);
+            padding-bottom: var(--space-xs);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .details-section p {
+            margin-bottom: var(--space-md);
+            color: var(--gray-700);
+            line-height: 1.5;
+        }
+
+        .details-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background-color: var(--gray-100);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .details-list li {
+            padding: var(--space-sm) var(--space-md);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .details-list li:last-child {
+            border-bottom: none;
+        }
+
+        .details-list li i {
+            color: var(--gold-unam);
+        }
+
+        .student-management {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .student-search {
+            position: relative;
+            margin-bottom: var(--space-md);
+        }
+
+        .student-search input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+        }
+
+        .student-search i {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+        }
+
+        .student-search-results {
+            margin-top: var(--space-sm);
+            background-color: var(--gray-100);
+            border-radius: var(--radius-md);
+            padding: var(--space-sm);
+            font-size: 0.9rem;
+        }
+
+        .student-search-results.found {
+            color: var(--azul-unam);
+            border-left: 3px solid var(--azul-unam);
+        }
+
+        .student-search-results.not-found {
+            color: #dc3545;
+            border-left: 3px solid #dc3545;
+        }
+
+        .student-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: var(--space-md);
+            background-color: var(--white);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .student-table th {
+            background-color: var(--azul-unam);
+            color: var(--white);
+            text-align: left;
+            padding: var(--space-sm);
+            font-size: 0.9rem;
+        }
+
+        .student-table td {
+            padding: var(--space-sm);
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 0.9rem;
+        }
+
+        .student-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .student-table button {
+            background-color: #dc3545;
+            color: var(--white);
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background-color var(--transition-normal);
+            font-size: 0.8rem;
+        }
+
+        .student-table button:hover {
+            background-color: #c82333;
+        }
+
+        .add-student-form {
+            display: flex;
+            gap: var(--space-sm);
+            margin-top: var(--space-sm);
+        }
+
+        .add-student-form select {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+        }
+
+        .add-student-form button {
+            background-color: var(--azul-unam);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background-color var(--transition-normal);
+        }
+
+        .add-student-form button:hover {
+            background-color: var(--azul-unam-l1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @keyframes dealCard {
+            0% { 
+                opacity: 0;
+                transform: translateY(100px) scale(0.8) rotate(5deg);
+            }
+            100% { 
+                opacity: 1;
+                transform: translateY(0) scale(1) rotate(0);
+            }
+        }
+
+        .deal-card {
+            animation: dealCard 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .aulas-search {
+            margin-bottom: var(--space-xl);
+            display: flex;
+            gap: var(--space-md);
+            position: relative;
+        }
+
+        .aulas-search input {
+            flex: 1;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            transition: all var(--transition-normal);
+        }
+
+        .aulas-search i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+            transition: color var(--transition-normal);
+        }
+
+        .aulas-search input:focus {
+            outline: none;
+            border-color: var(--azul-unam);
+            box-shadow: 0 0 0 3px rgba(0, 61, 121, 0.1);
+        }
+
+        .aulas-search input:focus + i {
+            color: var(--azul-unam);
+        }
+
+        .aulas-filters {
+            display: flex;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .aulas-filter-btn {
+            background-color: var(--white);
+            border: 1px solid var(--gray-300);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .aulas-filter-btn:hover, .aulas-filter-btn.active {
+            background-color: var(--azul-unam);
+            color: var(--white);
+            border-color: var(--azul-unam);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .aulas-filter-btn i {
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 480px) {
+            .aula-card-footer {
+                flex-direction: column;
+                gap: var(--space-sm);
+                align-items: flex-start;
+                padding: var(--space-sm);
+            }
+            
+            .aula-card-actions {
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: var(--space-xs);
+            }
+            
+            .aula-stats {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-xs);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .aulas-header h1 {
+                font-size: 2rem;
+            }
+            
+            .aulas-header p {
+                font-size: 1rem;
+            }
+            
+            .aulas-search {
+                flex-direction: column;
+            }
+            
+            .aulas-filters {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .aulas-header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .aula-card-footer {
+                flex-direction: column;
+                gap: var(--space-md);
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <a href="/">
+                <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM" />
+                <h1 class="alt-font">IntelliTutor UNAM</h1>
+            </a>
+        </div>
+
+        <nav class="menu">
+            <div class="header-btns">
+                <a href="{{ url_for('profesor_dashboard') }}" class="btn alt-font">Inicio</a>
+            </div>
+            <div class="user-menu">
+                <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
+            </div>
+        </nav>
+        
+        <div class="burger-menu" id="burgerMenu">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main>
+        <div class="aulas-container">
+            <div class="aulas-header">
+                <h1>Aulas Virtuales</h1>
+                <p>Gestiona tus grupos y estudiantes en un entorno virtual de aprendizaje diseñado para facilitar la enseñanza y el seguimiento académico.</p>
+            </div>
+
+            <div class="aulas-search">
+                <input type="text" placeholder="Buscar por nombre de grupo o estudiante..." id="searchAulas">
+                <i class="fas fa-search"></i>
+            </div>
+
+            <div class="aulas-filters">
+                <button class="aulas-filter-btn active"><i class="fas fa-th-large"></i> Todos</button>
+                <button class="aulas-filter-btn"><i class="fas fa-user-graduate"></i> Matutino</button>
+                <button class="aulas-filter-btn"><i class="fas fa-moon"></i> Vespertino</button>
+                <button class="aulas-filter-btn"><i class="fas fa-sort-amount-up"></i> Más estudiantes</button>
+                <button class="aulas-filter-btn"><i class="fas fa-sort-amount-down"></i> Menos estudiantes</button>
+            </div>
+
+            {% if grupos and grupos|length > 0 %}
+            <div class="aulas-grid" id="aulasGrid">
+                {% for grupo_id, grupo in grupos.items() %}
+                <div class="aula-card-container" data-index="{{ loop.index0 }}">
+                    <div class="aula-card" id="card-{{ grupo_id }}">
+                        <!-- Frente de la tarjeta -->
+                        <div class="aula-card-front">
+                            <div class="aula-card-header">
+                                <h2>{{ grupo.nombre }}</h2>
+                                <p>{{ grupo.descripcion }}</p>
+                                <i class="fas fa-chalkboard-teacher aula-card-icon"></i>
+                            </div>
+                            
+                            <div class="aula-card-body">
+
+                            </div>
+
+                            <div class="aula-card-footer">
+                                <div class="aula-stats">
+                                    <div><i class="fas fa-users"></i> {{ grupo.estudiantes|length if grupo.estudiantes else 0 }} Estudiantes</div>
+                                    <div><i class="fas fa-book"></i> {{ grupo.total_practicas }} Prácticas</div>
+                                </div>
+                                <div class="aula-card-actions">
+                                    <button class="edit" title="Editar grupo" onclick="flipCard('{{ grupo_id }}', 'edit')"><i class="fas fa-edit"></i></button>
+                                    <button title="Ver detalles" onclick="flipCard('{{ grupo_id }}', 'details')"><i class="fas fa-eye"></i></button>
+                                    <button title="Gestionar estudiantes" onclick="flipCard('{{ grupo_id }}', 'students')"><i class="fas fa-user-plus"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="aula-card-back edit-back" id="edit-{{ grupo_id }}">
+                            <div class="back-header">
+                                <h2>Editar Grupo</h2>
+                                <button class="back-btn" onclick="flipCardBack('{{ grupo_id }}')"><i class="fas fa-arrow-left"></i></button>
+                            </div>
+                            <div class="back-content">
+                                <form class="edit-form" id="edit-form-{{ grupo_id }}" action="{{ url_for('aulas', grupo_id=grupo_id) }}" method="POST">
+                                    <input type="hidden" name="editar_grupo_id" value="{{ grupo_id }}">
+
+                                    <div class="form-group">
+                                        <label for="descripcion-{{ grupo_id }}">Descripción:</label>
+                                        <textarea id="descripcion-{{ grupo_id }}" name="descripcion" required>{{ grupo.descripcion }}</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="turno-{{ grupo_id }}">Turno:</label>
+                                        <select id="turno-{{ grupo_id }}" name="turno" required>
+                                            <option value="matutino" {% if 'A-' in grupo.nombre %}selected{% endif %}>Matutino</option>
+                                            <option value="vespertino" {% if 'B-' in grupo.nombre %}selected{% endif %}>Vespertino</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="semestre-{{ grupo_id }}">Semestre:</label>
+                                        <select id="semestre-{{ grupo_id }}" name="semestre_id" class="form-input" required>
+                                            {% for semestre in semestres %}
+                                            <option value="{{ semestre.id }}">{{ semestre.nombre }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="submit-btn">Actualizar Grupo</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="aula-card-back details-back" id="details-{{ grupo_id }}">
+                            <div class="back-header">
+                                <h2>Detalles del Grupo</h2>
+                                <button class="back-btn" onclick="flipCardBack('{{ grupo_id }}')"><i class="fas fa-arrow-left"></i></button>
+                            </div>
+                            <div class="back-content">
+                                <div class="details-section">
+                                    <h3>Información General</h3>
+                                    <p><strong>Nombre:</strong> {{ grupo.nombre }}</p>
+                                    <p><strong>Descripción:</strong> {{ grupo.descripcion }}</p>
+                                    <p><strong>Turno:</strong> {% if 'A-' in grupo.nombre %}Matutino{% else %}Vespertino{% endif %}</p>
+                                </div>
+                                <div class="details-section">
+                                    <h3>Estudiantes Inscritos</h3>
+                                    {% if grupo.estudiantes and grupo.estudiantes|length > 0 %}
+                                    <ul class="details-list">
+                                        {% for estudiante in grupo.estudiantes %}
+                                        <li><i class="fas fa-user-graduate"></i> {{ estudiante }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% else %}
+                                    <p class="empty-list">No hay estudiantes inscritos en este grupo.</p>
+                                    {% endif %}
+                                </div>
+                                <div class="details-section">
+                                    <h3>Prácticas Activas</h3>
+                                    {% if grupo.practicas and grupo.practicas|length > 0 %}
+                                    <ul class="details-list">
+                                        {% for practica in grupo.practicas %}
+                                        <li><i class="fas fa-book"></i> {{ practica.titulo }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% else %}
+                                    <p class="empty-list">No hay prácticas activas para este grupo.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="aula-card-back students-back" id="students-{{ grupo_id }}">
+                            <div class="back-header">
+                                <h2>Gestionar Estudiantes</h2>
+                                <button class="back-btn" onclick="flipCardBack('{{ grupo_id }}')"><i class="fas fa-arrow-left"></i></button>
+                            </div>
+                            <div class="back-content">
+                                <div class="student-management">
+                                    <div class="student-search">
+                                        <input type="text" id="search-student-{{ grupo_id }}" placeholder="Buscar estudiante por nombre o número de cuenta...">
+                                        <i class="fas fa-search"></i>
+                                        <div class="student-search-results" id="search-results-{{ grupo_id }}" style="display: none;"></div>
+                                    </div>
+                                    
+                                    <h3>Agregar Estudiante</h3>
+                                    <form class="add-student-form" id="add-student-form-{{ grupo_id }}">
+                                        <select name="usuario_id" id="estudiante-select-{{ grupo_id }}" required>
+                                            <option value="">Seleccionar estudiante</option>
+                                        </select>
+                                        <button type="button" onclick="agregarEstudiante('{{ grupo_id }}')">Agregar</button>
+                                    </form>
+                                    
+                                    <h3>Estudiantes Inscritos</h3>
+                                    <table class="student-table" id="student-table-{{ grupo_id }}">
+                                        <thead>
+                                            <tr>
+                                                <th>Nombre</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% if grupo.estudiantes and grupo.estudiantes|length > 0 %}
+                                                {% for estudiante in grupo.estudiantes %}
+                                                <tr>
+                                                    <td>{{ estudiante }}</td>
+                                                    <td>
+                                                        <button onclick="eliminarEstudiante('{{ grupo_id }}', '{{ loop.index }}')">Eliminar</button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            {% else %}
+                                                <tr>
+                                                    <td colspan="2" class="empty-list">No hay estudiantes inscritos</td>
+                                                </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="create-class-card-container" data-index="{{ grupos|length }}">
+                    <div class="create-class-card" id="create-card">
+                        <div class="create-class-front" onclick="flipCreateCard()">
+                            <i class="fas fa-plus"></i>
+                            <h2>Crear Clase</h2>
+                        </div>
+                        <div class="create-class-back">
+                            <h2>Crear Grupo</h2>
+                            <form class="create-form" id="create-form" action="{{ url_for('aulas') }}" method="POST">
+                                <div class="form-group">
+                                    <label for="materia_id">Materia:</label>
+                                    <select id="materia_id" name="materia_id" class="form-input" required>
+                                        {% for materia in materias %}
+                                        <option value="{{ materia.id }}">{{ materia.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="semestre_id">Semestre:</label>
+                                    <select id="semestre_id" name="semestre_id" class="form-input" required>
+                                        {% for semestre in semestres %}
+                                        <option value="{{ semestre.id }}">{{ semestre.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="turno">Turno:</label>
+                                    <select id="turno" name="turno" required>
+                                        <option value="matutino">Matutino</option>
+                                        <option value="verpertino">Vespertino</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="grupo_id">Grupo:</label>
+                                    <select id="grupo_id" name="grupo_numero" class="form-input" required>
+                                        <option value="">Seleccione un grupo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="descripcion">Descripción:</label>
+                                    <textarea id="descripcion" name="descripcion" required></textarea>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="back-btn" onclick="flipCreateCardBack()">
+                                        <i class="fas fa-arrow-left"></i> Cancelar
+                                    </button>
+                                </div>
+                                <button type="submit" id="form-btn" class="submit-btn">Crear Grupo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="aula-empty">
+                <i class="fas fa-chalkboard"></i>
+                <h2>No hay aulas disponibles</h2>
+                <p>Crea tu primera aula virtual para comenzar a gestionar tus grupos y estudiantes.</p>
+                <a href="{{ url_for('crear_grupo') }}" class="btn">Crear Aula</a>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 IntelliTutor UNAM - Todos los derechos reservados</p>
+        <div class="footer-links">
+            <a href="#">Política de Privacidad</a>
+            <a href="#">Términos y Condiciones</a>
+            <a href="#">Contacto</a>
+            <a href="#">Ayuda</a>
+        </div>
+        <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const burgerMenu = document.getElementById('burgerMenu');
+            const menu = document.querySelector('.menu');
+            
+            if (burgerMenu) {
+                burgerMenu.addEventListener('click', function() {
+                    menu.classList.toggle('active');
+                });
+            }
+            
+            document.querySelectorAll('.aula-card-back, .create-class-back').forEach(back => {
+                back.style.display = 'none';
+            });
+            
+            const cardContainers = document.querySelectorAll('.aula-card-container, .create-class-card-container');
+            let delay = 0;
+            cardContainers.forEach((container, index) => {
+                delay = 80 * index + Math.random() * 50;
+                setTimeout(() => {
+                    container.classList.add('show');
+                    
+                    const progressBar = container.querySelector('.aula-progress-bar');
+                    if (progressBar) {
+                        setTimeout(() => {
+                            const currentWidth = progressBar.style.width;
+                            progressBar.style.width = '0%';
+                            setTimeout(() => {
+                                progressBar.style.width = currentWidth;
+                            }, 50);
+                        }, 300);
+                    }
+                    
+                    const metrics = container.querySelectorAll('.aula-metric');
+                    metrics.forEach((metric, i) => {
+                        metric.style.opacity = '0';
+                        metric.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            metric.style.opacity = '1';
+                            metric.style.transform = 'translateY(0)';
+                            metric.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        }, 300 + (i * 100));
+                    });
+                }, delay);
+            });
+            
+            initStudentSearch();
+            
+            initCreateGroupForm();
+            
+            cargarEstudiantesDisponibles();
+        });
+
+        function flipCard(grupoId, type) {
+            const card = document.getElementById(`card-${grupoId}`);
+            
+            document.querySelectorAll(`#card-${grupoId} .aula-card-back`).forEach(back => {
+                back.style.display = 'none';
+            });
+            
+            const targetBack = document.getElementById(`${type}-${grupoId}`);
+            targetBack.style.display = 'flex';
+            
+            card.classList.add('flipped');
+            
+            if (type === 'students') {
+                cargarEstudiantesParaGrupo(grupoId);
+            }
+        }
+        
+        function flipCardBack(grupoId) {
+            const card = document.getElementById(`card-${grupoId}`);
+            card.classList.remove('flipped');
+        }
+        
+        function flipCreateCard() {
+            const card = document.getElementById('create-card');
+            document.querySelector('.create-class-back').style.display = 'flex';
+            card.classList.add('flipped');
+        }
+        
+        function flipCreateCardBack() {
+            const card = document.getElementById('create-card');
+            card.classList.remove('flipped');
+        }
+        
+        function eliminarEstudiante(grupoId, estudianteIndex) {
+            if (confirm('¿Estás seguro de que deseas eliminar a este estudiante del grupo?')) {
+                const tabla = document.getElementById(`student-table-${grupoId}`);
+                const fila = tabla.querySelector(`tbody tr:nth-child(${estudianteIndex})`);
+                const nombreEstudiante = fila.querySelector('td:first-child').textContent;
+                
+                const select = document.getElementById(`estudiante-select-${grupoId}`);
+                let usuarioId = null;
+                
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].text === nombreEstudiante) {
+                        usuarioId = select.options[i].value;
+                        break;
+                    }
+                }
+                
+                if (!usuarioId && fila.dataset.usuarioId) {
+                    usuarioId = fila.dataset.usuarioId;
+                }
+                
+                if (!usuarioId) {
+                    usuarioId = estudianteIndex;
+                }
+                
+                fetch(`/gestionar_estudiantes/${grupoId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        usuario_id: usuarioId,
+                        accion: 'eliminar'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        fila.remove();
+                        
+                        const filas = tabla.querySelectorAll('tbody tr');
+                        if (filas.length === 0) {
+                            const tbody = tabla.querySelector('tbody');
+                            tbody.innerHTML = '<tr><td colspan="2" class="empty-list">No hay estudiantes inscritos</td></tr>';
+                        }
+                        
+                        actualizarContadorEstudiantes(grupoId);
+                        
+                        alert('Estudiante eliminado correctamente');
+                    } else {
+                        alert('Error al eliminar estudiante: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al procesar la solicitud');
+                });
+            }
+        }
+        
+        function agregarEstudiante(grupoId) {
+            const select = document.getElementById(`estudiante-select-${grupoId}`);
+            const usuarioId = select.value;
+            const nombreEstudiante = select.options[select.selectedIndex].text;
+            
+            if (!usuarioId) {
+                alert('Por favor selecciona un estudiante');
+                return;
+            }
+            
+            fetch(`/gestionar_estudiantes/${grupoId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    usuario_id: usuarioId,
+                    accion: 'agregar'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const tabla = document.getElementById(`student-table-${grupoId}`);
+                    const tbody = tabla.querySelector('tbody');
+                    
+                    const emptyRow = tbody.querySelector('.empty-list');
+                    if (emptyRow) {
+                        tbody.innerHTML = '';
+                    }
+                    
+                    const newRow = document.createElement('tr');
+                    newRow.dataset.usuarioId = usuarioId;
+                    newRow.innerHTML = `
+                        <td>${nombreEstudiante}</td>
+                        <td>
+                            <button onclick="eliminarEstudiante('${grupoId}', '${tbody.children.length + 1}')">Eliminar</button>
+                        </td>
+                    `;
+                    tbody.appendChild(newRow);
+                    
+                    actualizarContadorEstudiantes(grupoId);
+                    
+                    select.remove(select.selectedIndex);
+                    select.value = '';
+                    
+                    alert('Estudiante agregado correctamente');
+                } else {
+                    alert('Error al agregar estudiante: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al procesar la solicitud');
+            });
+        }
+        
+        function actualizarContadorEstudiantes(grupoId) {
+            const tabla = document.getElementById(`student-table-${grupoId}`);
+            const filas = tabla.querySelectorAll('tbody tr');
+            let numEstudiantes = filas.length;
+            
+            if (filas.length === 1 && filas[0].querySelector('.empty-list')) {
+                numEstudiantes = 0;
+            }
+            
+            const card = document.getElementById(`card-${grupoId}`);
+            const statsDiv = card.querySelector('.aula-stats div:first-child');
+            statsDiv.innerHTML = `<i class="fas fa-users"></i> ${numEstudiantes} Estudiantes`;
+            
+            const progressBar = card.querySelector('.aula-progress-bar');
+            if (progressBar) {
+                progressBar.style.width = `${(numEstudiantes / 30) * 100}%`;
+            }
+        }
+        
+        function cargarEstudiantesParaGrupo(grupoId) {
+            fetch('/api/usuarios')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.usuarios) {
+                        const estudiantes = data.usuarios.filter(u => u.rol === 'estudiante');
+                        const select = document.getElementById(`estudiante-select-${grupoId}`);
+                        
+                        while (select.options.length > 1) {
+                            select.remove(1);
+                        }
+                        
+                        const tabla = document.getElementById(`student-table-${grupoId}`);
+                        const estudiantesInscritos = Array.from(tabla.querySelectorAll('tbody tr td:first-child'))
+                            .map(td => td.textContent.trim());
+                        
+                        estudiantes.forEach(estudiante => {
+                            if (!estudiantesInscritos.includes(estudiante.nombre)) {
+                                const option = document.createElement('option');
+                                option.value = estudiante.id;
+                                option.textContent = estudiante.nombre;
+                                select.appendChild(option);
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar estudiantes:', error);
+                });
+        }
+        
+        function cargarEstudiantesDisponibles() {
+            fetch('/api/usuarios')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.usuarios) {
+                        window.todosEstudiantes = data.usuarios.filter(u => u.rol === 'estudiante');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al cargar estudiantes:', error);
+                });
+        }
+        
+        function initStudentSearch() {
+            document.querySelectorAll('[id^="search-student-"]').forEach(input => {
+                const grupoId = input.id.split('-')[2];
+                const resultsDiv = document.getElementById(`search-results-${grupoId}`);
+                
+                input.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    
+                    if (searchTerm.length < 3) {
+                        resultsDiv.style.display = 'none';
+                        return;
+                    }
+                    
+                    const tabla = document.getElementById(`student-table-${grupoId}`);
+                    const estudiantes = Array.from(tabla.querySelectorAll('tbody tr td:first-child'))
+                        .map(td => td.textContent.toLowerCase());
+                    
+                    const found = estudiantes.some(estudiante => estudiante.includes(searchTerm));
+                    
+                    resultsDiv.style.display = 'block';
+                    if (found) {
+                        resultsDiv.textContent = `El estudiante "${searchTerm}" está inscrito en este grupo.`;
+                        resultsDiv.className = 'student-search-results found';
+                    } else {
+                        resultsDiv.textContent = `El estudiante "${searchTerm}" no está inscrito en este grupo.`;
+                        resultsDiv.className = 'student-search-results not-found';
+                    }
+                });
+            });
+        }
+        
+        function initCreateGroupForm() {
+    const semestreSelect = document.getElementById('semestre_id');
+    const turnoSelect = document.getElementById('turno');
+    const grupoSelect = document.getElementById('grupo_id');
+
+    function updateGrupos() {
+        const semestreId = semestreSelect.value;
+        const turno = turnoSelect.value === 'matutino' ? 'A' : 'B';
+
+        grupoSelect.innerHTML = '<option value="">Seleccione un grupo</option>'; 
+
+        if (semestreId) {
+            for (let i = 1; i <= 3; i++) {
+                const grupoNumero = `0${i}`.slice(-2); 
+                const option = document.createElement('option');
+                option.value = grupoNumero; 
+                option.textContent = grupoNumero;
+                grupoSelect.appendChild(option);
+            }
+        }
+    }
+
+    // Eventos para actualizar los grupos
+    if (semestreSelect && turnoSelect) {
+        semestreSelect.addEventListener('change', updateGrupos);
+        turnoSelect.addEventListener('change', function() {
+            updateGrupos(); 
+        });
+
+        updateGrupos();
+    }
+
+    const createForm = document.getElementById('create-form');
+    if (createForm) {
+        createForm.addEventListener('submit', function(e) {
+        });
+    }
+}
+        
+        document.querySelectorAll('.edit-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+            });
+        });
+
+        document.getElementById('searchAulas').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const cards = document.querySelectorAll('.aula-card-container');
+
+            cards.forEach(card => {
+                const cardElement = card.querySelector('.aula-card');
+                if (!cardElement) return; 
+                
+                const groupName = cardElement.querySelector('.aula-card-header h2').textContent.toLowerCase();
+                const description = cardElement.querySelector('.aula-card-header p').textContent.toLowerCase();
+                
+                const matchesSearch = groupName.includes(searchTerm) || description.includes(searchTerm);
+
+                card.style.display = matchesSearch ? 'block' : 'none';
+            });
+            
+            document.querySelector('.create-class-card-container').style.display = 'block';
+        });
+
+        const filterButtons = document.querySelectorAll('.aulas-filter-btn');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                const filterType = this.textContent.trim();
+                const cards = Array.from(document.querySelectorAll('.aula-card-container'));
+                const createCardContainer = document.querySelector('.create-class-card-container');
+
+                cards.forEach(card => card.style.display = 'block');
+
+                if (filterType.includes("Matutino")) {
+                    cards.forEach(card => {
+                        const cardElement = card.querySelector('.aula-card');
+                        if (!cardElement) return; 
+                        
+                        const groupName = cardElement.querySelector('.aula-card-header h2').textContent;
+                        card.style.display = groupName.includes("A-") ? 'block' : 'none';
+                    });
+                
+                } else if (filterType.includes("Vespertino")) {
+                    cards.forEach(card => {
+                        const cardElement = card.querySelector('.aula-card');
+                        if (!cardElement) return; 
+                        
+                        const groupName = cardElement.querySelector('.aula-card-header h2').textContent;
+                        card.style.display = groupName.includes("B-") ? 'block' : 'none';
+                    });
+                
+                } else if (filterType.includes("Más estudiantes") || filterType.includes("Menos estudiantes")) {
+                    const container = document.querySelector('.aulas-grid');
+                    
+                    if (createCardContainer) {
+                        container.removeChild(createCardContainer);
+                    }
+                
+                    const sortedCards = cards.sort((a, b) => {
+                        const cardElementA = a.querySelector('.aula-card');
+                        const cardElementB = b.querySelector('.aula-card');
+                        
+                        if (!cardElementA || !cardElementB) return 0;
+                        
+                        const studentsTextA = cardElementA.querySelector('.aula-stats div:first-child').textContent;
+                        const studentsTextB = cardElementB.querySelector('.aula-stats div:first-child').textContent;
+                        
+                        const studentsA = parseInt(studentsTextA.match(/\d+/)[0]) || 0;
+                        const studentsB = parseInt(studentsTextB.match(/\d+/)[0]) || 0;
+                        
+                        return filterType.includes("Más estudiantes") ? studentsB - studentsA : studentsA - studentsB;
+                    });
+                
+                    container.innerHTML = "";
+                    sortedCards.forEach(card => container.appendChild(card));
+                    
+                    if (createCardContainer) {
+                        container.appendChild(createCardContainer);
+                    }
+                }
+                
+                document.querySelector('.create-class-card-container').style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

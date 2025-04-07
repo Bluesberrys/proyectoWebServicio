@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Estudiantes</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Josefin+Slab:wght@100..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+          <a href="/">
+            <img src="{{ url_for('static', filename='img/Escudo-UNAM-white.svg') }}" alt="Logo UNAM" />
+            <h1 class="alt-font">IntelliTutor UNAM</h1>
+          </a>
+        </div>
+  
+        <div class="menu">
+          <div class="header-btns">
+            <a href="{{ url_for('profesor_dashboard') }}" class="btn alt-font">Inicio</a>
+            <a href="{{ url_for('practicas') }}" class="btn alt-font">Prácticas</a>
+            <a href="{{ url_for('evaluacion') }}" class="btn alt-font">Evaluación</a>
+          </div>
+          <div class="user-menu">
+            <a href="{{ url_for('logout') }}" class="btn alt-font">Cerrar sesión</a>
+          </div>
+        </div>
+  
+        <div id="burgerMenu" class="burger-menu">
+            <i class="fas fa-bars"></i>
+        </div>
+    </header>
+
+    <main id="usuarios">
+        <div id="form-container">
+            <h2 class="alt-font">Agregar Estudiante</h2>
+            <form action="{{ url_for('profesor_usuarios') }}" method="POST" id="usuario-gen-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" class="form-input" required>
+                </div>
+
+                <button type="submit" id="form-btn" class="alt-font">Agregar Estudiante</button>
+            </form>
+        </div>
+
+        <div id="table-container">
+            <h2 class="alt-font">Lista de Estudiantes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for estudiante in estudiantes %}
+                    <tr>
+                        <td>{{ estudiante.id }}</td>
+                        <td>{{ estudiante.nombre }}</td>
+                        <td>{{ estudiante.email }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <script src="{{ url_for('static', filename='js/functions.js') }}"></script>
+</body>
+</html>

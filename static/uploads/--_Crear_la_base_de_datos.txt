@@ -1,0 +1,22 @@
+-- Crear la base de datos
+CREATE DATABASE MiPrimeraBD;
+
+-- Usar la base de datos recién creada
+USE MiPrimeraBD;
+
+-- Crear una tabla simple
+CREATE TABLE Estudiantes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    edad INT,
+    correo VARCHAR(100) UNIQUE
+);
+
+-- Insertar algunos datos de prueba
+INSERT INTO Estudiantes (nombre, edad, correo) VALUES
+('Juan Pérez', 20, 'juan@example.com'),
+('María López', 22, 'maria@example.com'),
+('Carlos Gómez', 21, 'carlos@example.com');
+
+-- Consultar los datos
+SELECT * FROM Estudiantes;
